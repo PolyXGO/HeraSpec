@@ -40,6 +40,18 @@ heraspec change start "add-user-authentication"
 - ✅ Delta specifications
 - ✅ Task management with skills system
 
+## AI Integration
+
+Integrate with AI tools for better development workflow: Cursor, Antigravity, Windsurf, Copilot, and Claude Desktop. HeraSpec automatically generates specifications that AI tools can understand and implement.
+
+### Supported AI Tools
+
+- **Cursor** - Native AGENTS.md support for automatic change creation
+- **Antigravity** - AGENTS.md integration for spec-driven development
+- **Windsurf** - AI-powered workflow with HeraSpec specifications
+- **Copilot** - Enhanced development with structured specs
+- **Claude Desktop** - MCP-ready architecture for AI assistance
+
 ## License
 
 MIT License - see [LICENSE](./LICENSE) file for details.

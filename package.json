@@ -13,13 +13,17 @@
     "perfex",
     "laravel"
   ],
-  "homepage": "https://github.com/yourusername/heraspec",
+  "homepage": "https://github.com/PolyXGO/HeraSpec",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/heraspec"
+    "url": "https://github.com/PolyXGO/HeraSpec.git"
   },
   "license": "MIT",
-  "author": "HeraSpec Contributors",
+  "author": {
+    "name": "PolyXGO",
+    "email": "polyxgo@gmail.com",
+    "url": "https://headrandom.com"
+  },
   "type": "module",
   "publishConfig": {
     "access": "public"

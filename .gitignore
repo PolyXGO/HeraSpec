@@ -35,6 +35,13 @@ logs
 ehthumbs.db
 Thumbs.db
 
+# private files
+GITHUB_UPLOAD_GUIDE.md
+NPM_PUBLISH_GUIDE.md
+
+# npm specific ignores
+.npmignore
+
 # IDE files
 .vscode/
 .idea/
