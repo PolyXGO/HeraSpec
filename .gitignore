@@ -38,6 +38,7 @@ Thumbs.db
 # private files
 GITHUB_UPLOAD_GUIDE.md
 NPM_PUBLISH_GUIDE.md
+setup-npm-token.sh
 
 # npm specific ignores
 .npmignore
