@@ -1,19 +1,45 @@
-# HeraSpec Kiến Trúc
-
-> **Lưu ý**: Tài liệu này đang được dịch. Hiện tại có thể xem bản tiếng Anh đầy đủ tại [ARCHITECTURE.md](../en/ARCHITECTURE.md)
+# Kiến Trúc HeraSpec
 
 ## Tổng Quan
 
-HeraSpec được xây dựng bằng TypeScript và tuân theo kiến trúc mô-đun.
+HeraSpec được xây dựng bằng TypeScript và tuân theo kiến trúc module:
 
-Tài liệu đầy đủ bằng tiếng Việt đang được phát triển và sẽ sớm có sẵn.
+```
+src/
+├── cli/              # Điểm truy cập CLI
+├── commands/         # Triển khai các lệnh
+├── core/             # Logic cốt lõi
+│   ├── config.ts     # Các hằng số cấu hình
+│   ├── schemas/      # Zod schemas để validation
+│   ├── parsers/      # Xử lý Markdown
+│   ├── validation/   # Logic kiểm tra (validation)
+│   ├── templates/    # Các file mẫu (templates)
+│   └── ...
+└── utils/            # Các hàm tiện ích
+```
 
-## Tài Liệu Liên Quan
+## Các Khái Niệm Cốt Lõi
 
-- [English Version](../en/ARCHITECTURE.md) - Bản tiếng Anh đầy đủ
-- [Development Setup](./DEVELOPMENT_SETUP.md) - Hướng dẫn thiết lập môi trường phát triển
-- [Skills System](./SKILLS_SYSTEM.md) - Hệ thống Skills
+### Spec
+Tài liệu cấu trúc định nghĩa yêu cầu, scenarios, và quy tắc. Nằm trong `heraspec/specs/` và là "nguồn sự thật" (source of truth) cho dự án.
 
-## Đóng Góp
+### Change
+Một đề xuất thay đổi nằm trong `heraspec/changes/<slug>/`, chứa proposal, tasks và delta specs.
 
-Nếu bạn muốn đóng góp bản dịch tiếng Việt, vui lòng xem [UPDATE_CHECKLIST.md](./UPDATE_CHECKLIST.md) để biết hướng dẫn.
+### Skill
+Các quy trình và tài nguyên có thể tái sử dụng cho từng loại dự án (project type).
+
+**WordPress:**
+- admin-settings-page
+- custom-post-type
+- shortcode
+- ux-element (Hỗ trợ Flatsome UX Builder)
+
+Xem [PROJECT_TYPES_AND_SKILLS.md](PROJECT_TYPES_AND_SKILLS.md) để biết danh sách chuyên sâu.
+
+## Quy Trình Xử Lý
+
+1. **Phát triển**: AI hoặc con người tạo change và specs.
+2. **Kiểm tra**: Chạy `heraspec validate` để đảm bảo spec đúng định dạng.
+3. **Thực hiện**: Triển khai code dựa trên specs và sự hỗ trợ của các Skills.
+4. **Lưu trữ**: Chạy `heraspec archive` để merge specs vào hệ thống chính.

@@ -309,6 +309,17 @@ python3 heraspec/skills/ui-ux/scripts/search.py "pricing plans" --domain pages
 
 3. Read \`heraspec/skills/ui-ux/ui-ux-skill.md\` for complete documentation
 
+### Flatsome UX Element Skill
+
+Use the **ux-element** skill when developing elements for UX Builder in Flatsome themes.
+
+**Usage:**
+\`\`\`bash
+heraspec skill add ux-element --project-type wordpress
+\`\`\`
+
+Read \`heraspec/skills/wordpress/ux-element/skill.md\` for the **Wrapping Rule** and template usage.
+
 ## Creating New Skills
 
 1. Create skill folder structure

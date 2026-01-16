@@ -456,6 +456,7 @@ heraspec skill add module-codebase --project-type perfex-module
    #   - ui-ux (cross-cutting)
    #   - documents (cross-cutting)
    #   - unit-test (cross-cutting)
+   #   - ux-element (projectType: wordpress)
    #   - module-codebase (projectType: perfex-module)
    ```
 
@@ -481,6 +482,9 @@ heraspec skill add module-codebase --project-type perfex-module
    ```bash
    # Add Perfex module skill
    heraspec skill add module-codebase --project-type perfex-module
+
+   # Add WordPress UX Element skill
+   heraspec skill add ux-element --project-type wordpress
    ```
 
 4. **What gets copied:**
@@ -1106,6 +1110,27 @@ These tools also support AGENTS.md:
 1. Ensure `AGENTS.heraspec.md` file exists at root
 2. Ask AI in correct format
 3. AI will follow workflow in AGENTS.heraspec.md
+
+### How to Prompt AI with Skills
+
+To get the best results when requesting AI to implement a specific feature using a skill, provide detailed requirements and explicitly mention the skill.
+
+**Example for UX Builder Element:**
+
+Prompt:
+```
+Based on the `ux-element` skill, create a 'Countdown' element for the `PolyUtilities` plugin.
+
+Requirements:
+1. Allow setting a target date and time (Countdown To).
+2. Provide options for display format (e.g., Days:Hours:Minutes:Seconds).
+3. Include a custom Heading field.
+4. Include an 'Expired Message' field to display after the countdown ends.
+
+Task: `(projectType: wordpress, skill: ux-element)`
+```
+
+AI will automatically find the skill in `heraspec/skills/wordpress/ux-element/`, read `skill.md`, and use the provided templates to ensure the element follows all technical standards and supports real-time preview.
 
 ### Sample Workflow
 

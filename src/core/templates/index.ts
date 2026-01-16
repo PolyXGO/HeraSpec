@@ -107,6 +107,13 @@ This document defines the workflow for AI agents working with HeraSpec.
 - Agent implements with proper colors, fonts, styles from search results
 - Agent verifies with pre-delivery checklist
 
+**Special case - Flatsome UX Element skill:**
+- Task: \`(projectType: wordpress, skill: ux-element)\`
+- Agent reads: \`heraspec/skills/wordpress/ux-element/skill.md\`
+- Agent MUST follow the **Wrapping Rule**: Use \`<span>\` with \`id="{{:: shortcode.$id }}"\`
+- Agent uses templates from \`heraspec/skills/wordpress/ux-element/templates/\` (Controller, Shortcode, HTML Template, SVG Thumbnail)
+- Agent ensures real-time preview support in AngularJS template.
+
 - Follow tasks.md
 - Mark tasks completed: \`- [x]\`
 
@@ -243,28 +250,15 @@ export const SKILLS_SECTION_TEMPLATE = `## Skills System
 - Agent follows: Steps, uses templates, runs scripts
 - Agent implements: According to skill.md guidelines
 
-**Special case - UI/UX skill:**
-- Task: \`(skill: ui-ux)\`
-- Agent reads: \`heraspec/skills/ui-ux/skill.md\`
-- Agent MUST use search scripts before implementing:
-  \`\`\`bash
-  # Search for design intelligence (BM25 - default, fast)
-  python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --domain <domain>
-  
-  # For better semantic results, use Vector or Hybrid mode:
-  python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --domain <domain> --mode vector
-  python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --domain <domain> --mode hybrid
-  
-  # Stack-specific search
-  python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --stack <stack>
-  \`\`\`
-- **Search Modes:**
-  - **BM25 (default)**: Fast keyword-based search, zero dependencies
-  - **Vector**: Semantic search, ~15-20% better results (requires: pip install sentence-transformers scikit-learn)
-  - **Hybrid**: Best of both, ~25% better results (requires: pip install sentence-transformers scikit-learn)
-- Agent synthesizes search results
 - Agent implements with proper colors, fonts, styles from search results
 - Agent verifies with pre-delivery checklist
+
+**Special case - Flatsome UX Element skill:**
+- Task: \`(projectType: wordpress, skill: ux-element)\`
+- Agent reads: \`heraspec/skills/wordpress/ux-element/skill.md\`
+- Agent MUST follow the **Wrapping Rule**: Use \`<span>\` with \`id="{{:: shortcode.$id }}"\`
+- Agent uses templates from \`heraspec/skills/wordpress/ux-element/templates/\` (Controller, Shortcode, HTML Template, SVG Thumbnail)
+- Agent ensures real-time preview support in AngularJS template.
 
 ### Skill Discovery
 

@@ -51,6 +51,12 @@ export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
     isCrossCutting: false,
     projectType: 'perfex-module',
   },
+  'wordpress:ux-element': {
+    templateFileName: 'ux-element-skill.md',
+    isCrossCutting: false,
+    projectType: 'wordpress',
+    resourceDirs: ['ux-element/templates'],
+  },
 };
 
 /**

@@ -19,6 +19,7 @@ WordPress plugin development.
 - `admin-menu-item` - Add admin menu items
 - `meta-box` - Create meta boxes
 - `taxonomy` - Register custom taxonomies
+- `ux-element` - Create Flatsome UX Builder elements
 
 ### wordpress-theme
 
@@ -31,6 +32,7 @@ WordPress theme development.
 - `widget-area` - Register widget areas
 - `customizer-setting` - Theme customizer settings
 - `theme-option` - Theme options pages
+- `ux-element` - Create Flatsome UX Builder elements
 
 ### perfex-module
 

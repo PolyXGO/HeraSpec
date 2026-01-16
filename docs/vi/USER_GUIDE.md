@@ -456,6 +456,7 @@ heraspec skill add module-codebase --project-type perfex-module
    #   - ui-ux (cross-cutting)
    #   - documents (cross-cutting)
    #   - unit-test (cross-cutting)
+   #   - ux-element (projectType: wordpress)
    #   - module-codebase (projectType: perfex-module)
    ```
 
@@ -481,6 +482,9 @@ heraspec skill add module-codebase --project-type perfex-module
    ```bash
    # Thêm Perfex module skill
    heraspec skill add module-codebase --project-type perfex-module
+
+   # Thêm WordPress UX Element skill
+   heraspec skill add ux-element --project-type wordpress
    ```
 
 4. **Những gì được copy:**
@@ -1103,9 +1107,30 @@ Các công cụ này tự động đọc `AGENTS.heraspec.md`. Bạn chỉ cần
 
 Các công cụ này cũng hỗ trợ AGENTS.md:
 
-1. Đảm bảo file `AGENTS.heraspec.md` tồn tại tại root
-2. Yêu cầu AI theo đúng format
-3. AI sẽ làm theo workflow trong AGENTS.heraspec.md
+1. Đảm bảo file `AGENTS.heraspec.md` đã tồn tại ở thư mục gốc.
+2. Đặt câu hỏi cho AI theo đúng định dạng.
+3. AI sẽ tuân theo workflow được định nghĩa trong file `AGENTS.heraspec.md`.
+
+### Cách Gửi Prompt Cho AI Kèm Skill
+
+Để có kết quả tốt nhất khi yêu cầu AI triển khai một tính năng cụ thể bằng cách sử dụng một skill, hãy cung cấp các yêu cầu chi tiết và nêu rõ tên skill.
+
+**Ví dụ về UX Builder Element:**
+
+Prompt:
+```
+Dựa vào skill `ux-element`, hãy tạo một element 'Countdown' cho plugin `PolyUtilities`.
+
+Yêu cầu:
+1. Cho phép thiết lập thời điểm countdown (Countdown To).
+2. Tùy chọn định dạng hiển thị (ví dụ: Ngày:Giờ:Phút:Giây).
+3. Bao gồm trường Heading (Tiêu đề) tùy chỉnh.
+4. Bao gồm trường 'Expired Message' (Thông điệp khi hết hạn) để hiển thị khi thời gian kết thúc.
+
+Task: `(projectType: wordpress, skill: ux-element)`
+```
+
+AI sẽ tự động tìm skill trong thư mục `heraspec/skills/wordpress/ux-element/`, đọc file `skill.md`, và sử dụng các template có sẵn để đảm bảo element tuân theo các tiêu chuẩn kỹ thuật và hỗ trợ xem trước thời gian thực.
 
 ### Workflow Mẫu
 

@@ -22,9 +22,10 @@ This directory contains documentation for HeraSpec in multiple languages.
 
 ### Vietnamese Documentation (Tiếng Việt)
 
-- [Hướng Dẫn Sử Dụng](./vi/HUONG_DAN_SU_DUNG.md) - User Guide
-- [Development Setup](./en/DEVELOPMENT_SETUP.md) - (English)
-- [Architecture](./en/ARCHITECTURE.md) - (English)
+- [Hướng Dẫn Sử Dụng](./vi/USER_GUIDE.md)
+- [Hệ Thống Skills](./vi/SKILLS_SYSTEM.md)
+- [Kiến Trúc](./vi/ARCHITECTURE.md)
+- [Thiết Lập Môi Trường](./vi/DEVELOPMENT_SETUP.md)
 
 ## Documentation Structure
 

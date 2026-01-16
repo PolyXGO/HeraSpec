@@ -65,6 +65,7 @@ Reusable patterns within a project type:
 - custom-post-type
 - shortcode
 - rest-endpoint
+- ux-element (Flatsome)
 
 **Perfex Module:**
 - module-registration

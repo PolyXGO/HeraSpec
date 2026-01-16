@@ -6,22 +6,22 @@ Tài liệu đầy đủ cho HeraSpec bằng tiếng Việt.
 
 ### Hướng Dẫn Sử Dụng
 
-- **[Hướng Dẫn Sử Dụng](./HUONG_DAN_SU_DUNG.md)** - Hướng dẫn sử dụng HeraSpec đầy đủ
+- **[Hướng Dẫn Sử Dụng](./USER_GUIDE.md)** - Hướng dẫn sử dụng HeraSpec đầy đủ
 
 ### Bắt Đầu
 
-- **[Development Setup](./DEVELOPMENT_SETUP.md)** - Hướng dẫn setup môi trường phát triển (đang dịch)
-- **[Architecture](./ARCHITECTURE.md)** - Kiến trúc và thiết kế kỹ thuật (đang dịch)
+- **[Thiết Lập Môi Trường](./DEVELOPMENT_SETUP.md)** - Hướng dẫn setup môi trường phát triển (đang dịch)
+- **[Kiến Trúc](./ARCHITECTURE.md)** - Kiến trúc và thiết kế kỹ thuật
 
 ### Skills System
 
-- **[Skills System](./SKILLS_SYSTEM.md)** - Hướng dẫn về Skills system (đang dịch)
+- **[Hệ Thống Skills](./SKILLS_SYSTEM.md)** - Hướng dẫn về Skills system
 - **[Skills Structure Proposal](./SKILLS_STRUCTURE_PROPOSAL.md)** - Đề xuất cấu trúc Skills (đang dịch)
 - **[UI/UX Skill Setup](./UI_UX_SKILL_SETUP.md)** - Setup UI/UX skill (đang dịch)
 
 ### Tham Khảo
 
-- **[Project Types and Skills](./PROJECT_TYPES_AND_SKILLS.md)** - Danh sách project types và skills (đang dịch)
+- **[Project Types và Skills](./PROJECT_TYPES_AND_SKILLS.md)** - Danh sách project types và skills
 - **[Init Safety Guide](./INIT_SAFETY.md)** - Hướng dẫn an toàn khi chạy `heraspec init` (đang dịch)
 - **[Update Checklist](./UPDATE_CHECKLIST.md)** - Checklist cập nhật tài liệu (đang dịch)
 

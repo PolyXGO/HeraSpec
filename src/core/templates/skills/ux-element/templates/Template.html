@@ -1,0 +1,19 @@
+<span id="{{:: shortcode.$id }}">
+    <div class="{{class_prefix}}{{element_slug}} {{ shortcode.options.class }} {{ shortcode.options.visibility }}"
+         ng-style="{
+             'color': shortcode.options.textColor,
+             'background-color': shortcode.options.bgColor
+         }">
+        <span ng-bind="shortcode.options.title"></span>
+    </div>
+
+    <style scope="scope">
+        #{{::shortcode.$id }} .{{class_prefix}}{{element_slug}} {
+            /* Add scoped styles here */
+        }
+        
+        #{{::shortcode.$id }} .{{class_prefix}}{{element_slug}}:hover {
+            /* Hover effects */
+        }
+    </style>
+</span>

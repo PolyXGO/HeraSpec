@@ -10,20 +10,22 @@ The Skills System allows AI agents to implement tasks consistently by using inst
 heraspec/skills/
 ├── README.md                    # Overview of skills
 │
+├── wordpress/                   # Project-specific skills
+│   └── theme/
+│       └── flatsome/
+│           └── ux-element/      # Nested skill structure
+│               ├── skill.md
+│               ├── templates/
+│               └── ...
+│
 ├── perfex-module/              # Skills for Perfex module
 │   ├── module-codebase/
-│   │   ├── skill.md            # Detailed instructions
-│   │   ├── templates/          # Available templates
-│   │   ├── scripts/            # Automation scripts
-│   │   └── examples/           # Good/bad examples
-│   └── module-registration/
-│       └── ...
+│   │   ├── skill.md
+│   │   └── ...
 │
 └── ui-ux/                      # Cross-cutting skill
     ├── skill.md
-    ├── templates/
-    ├── scripts/
-    └── examples/
+    └── ...
 ```
 
 ## How Agents Use Skills
@@ -148,10 +150,11 @@ Description of what this skill is used for.
 - `database-table` - Create database tables
 - `api-endpoint` - Create API endpoints
 
-**WordPress Plugin:**
+**WordPress:**
 - `admin-settings-page` - Create admin settings pages
 - `custom-post-type` - Register custom post types
 - `shortcode` - Create shortcodes
+- `ux-element` - Create Flatsome UX Builder elements
 - `rest-endpoint` - WordPress REST API endpoints
 - And many more skills...
 
@@ -201,6 +204,25 @@ heraspec skill list
 heraspec skill show module-codebase --project-type perfex-module
 heraspec skill show ui-ux
 ```
+
+## Practical Examples
+
+### Creating a Flatsome UX Element
+
+When you want to create a new UI component for Flatsome, you can prompt the agent like this:
+
+**Prompt Example:**
+> "Based on the `ux-element` skill, create a 'Countdown' element for the `PolyUtilities` plugin.
+> 
+> **Requirements:**
+> 1. Allow setting a target date and time (Countdown To).
+> 2. Provide options for display format (e.g., Days:Hours:Minutes:Seconds).
+> 3. Include a custom Heading field.
+> 4. Include an 'Expired Message' field to display after the countdown ends.
+> 
+> **Task:** `(projectType: wordpress, skill: ux-element)`"
+
+The agent will then follow the `ux-element` skill guidelines, using the provided PHP and HTML templates to ensure real-time preview support in the UX Builder.
 
 ## Benefits
 
