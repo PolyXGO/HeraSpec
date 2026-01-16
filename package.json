@@ -1,0 +1,67 @@
+{
+  "name": "heraspec",
+  "version": "0.1.0",
+  "description": "Universal spec-first development framework + CLI for all project types and AI tools",
+  "keywords": [
+    "heraspec",
+    "specs",
+    "cli",
+    "ai",
+    "development",
+    "spec-driven",
+    "wordpress",
+    "perfex",
+    "laravel"
+  ],
+  "homepage": "https://github.com/yourusername/heraspec",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/heraspec"
+  },
+  "license": "MIT",
+  "author": "HeraSpec Contributors",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "heraspec": "./bin/heraspec.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "!dist/**/*.test.js",
+    "!dist/**/__tests__",
+    "!dist/**/*.map"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "dev": "tsc --watch",
+    "dev:cli": "npm run build && node bin/heraspec.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@inquirer/core": "^10.2.2",
+    "@inquirer/prompts": "^7.8.0",
+    "chalk": "^5.5.0",
+    "commander": "^14.0.0",
+    "ora": "^8.2.0",
+    "zod": "^4.0.17"
+  }
+}
+
