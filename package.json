@@ -1,6 +1,6 @@
 {
   "name": "heraspec",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Universal spec-first development framework + CLI for all project types and AI tools",
   "keywords": [
     "heraspec",
@@ -68,4 +68,3 @@
     "zod": "^4.0.17"
   }
 }
-
