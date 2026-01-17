@@ -1,114 +1,76 @@
-# Skill: Documents (Cross-Cutting)
+# Skill: Documents (Cross-Cutting & Multi-Format)
 
 ## Purpose
 
-This skill is used to create documentation for both technical and end-user audiences. Ensures documentation is complete, clear, and easy to understand.
+This skill is used to create comprehensive documentation for both technical and end-user audiences. It supports parallel generation of Markdown files (for repository/GitHub) and interactive HTML files (for browser-based manuals).
 
-## When to Use
+## Core Requirements
 
-- When creating technical documentation
-- When writing user guides
-- When documenting APIs
-- When creating changelogs
-- When writing installation/setup guides
+### 1. Multi-Format Output
+Every documentation task should ideally generate three versions:
+- `doc-name.md`: Clean Markdown for version control.
+- `doc-name.html`: Interactive HTML with a modern split-panel layout for deep reading.
+- `documentation-landing-page.html`: A high-end, visual landing page to showcase features and provide entry points.
 
-## Step-by-Step Process
+### 2. HTML Layout (Premium Standard)
+- **Documentation Page**: Split-panel (Sidebar for Nav, Content for reading). Smooth scroll-spy included.
+- **Landing Page**: Full-screen Hero section, feature grids with hover effects, and clear Calls to Action (CTA).
 
-### Step 1: Identify Document Type
-- Technical docs: For developers
-- User guide: For end-users
-- API docs: For API consumers
-- Changelog: For version releases
+### 3. Visual Excellence
+- Use the `ui-ux` skill to determine the theme colors, typography gradients, and spacing.
+- The Landing Page must include scroll animations (fade-in, transform) to feel premium and alive.
 
-### Step 2: Choose Appropriate Template
-- Technical: `templates/technical-doc-template.md`
-- User guide: `templates/user-guide-template.md`
-- API: `templates/api-doc-template.md`
-- Changelog: `templates/changelog-template.md`
+## Implementation Steps
 
-### Step 3: Gather Information
-- Features and functionality
-- Installation steps
-- Configuration options
-- Usage examples
-- Troubleshooting tips
+### Step 1: Define Content and Flow
+1. Outline the main technical content for the `.md` and `.html` docs.
+2. Identify the "Key Features" and "USP" (Unique Selling Points) for the Landing Page feature grid.
 
-### Step 4: Write Documentation
-- Follow template structure
-- Use good examples as reference
-- Ensure code examples work
-- Include screenshots if needed
+### Step 2: Generate Markdown & Documentation HTML
+1. Populate `technical-doc-template.md` (or user guide).
+2. Populate `documentation.html` with navigation and sections.
 
-### Step 5: Validate & Generate
-- Run script: `scripts/validate-docs.py`
-- Run script: `scripts/generate-docs.sh` (if available)
-- Review with good examples
-- Test with target audience
+### Step 3: Integrate Landing Page
+1. Use `templates/documentation-landing-page.html`.
+2. **Hero Section**: Write a compelling headline and description.
+3. **Feature Grid**: Create cards for each major feature using `<div class="feature-card">`.
+4. **Integration**: Link the CTA buttons to `documentation.html`.
+5. Apply `landing-style.css` and `landing-script.js`.
 
 ## Required Input
 
 - **Document type**: Technical, user guide, API, changelog
 - **Target audience**: Developers, end-users, admins
-- **Features to document**: List of features to document
-- **Code examples**: Code samples to include
-- **Screenshots**: Images if needed
+- **Structural Outline**: List of headings and sub-headings
+- **Design Cues**: Colors and icons from `ui-ux` skill
 
 ## Expected Output
 
-- Complete documentation file
-- Proper formatting and structure
-- Working code examples
-- Clear instructions
-- Troubleshooting section
+- `file.md`: Complete documentation in Markdown.
+- `file.html`: Interactive split-panel HTML documentation.
+- `style.css`: Documentation styles.
+- `script.js`: Documentation interactivity.
 
 ## Tone & Rules
 
-### Writing Style
-- **Clear**: Write clearly, easy to understand
-- **Concise**: Brief, not verbose
-- **Actionable**: Can be followed
-- **Complete**: Complete necessary information
-
-### Technical Docs
-- Code examples must work
-- Include prerequisites
-- Explain "why" not just "what"
-- Link to related docs
-
-### User Guides
-- Step-by-step instructions
-- Screenshots for complex steps
-- Common issues and solutions
-- Plain language (avoid jargon)
-
-### Limitations
-- ❌ DO NOT skip prerequisites
-- ❌ DO NOT assume prior knowledge
-- ❌ DO NOT use untested code examples
-- ❌ DO NOT write too technical for user guides
-- ❌ DO NOT skip troubleshooting
+- **Consistent Content**: The content in MD and HTML MUST be identical in substance.
+- **No Inline Bloat**: Keep CSS and JS in separate files as provided in the templates.
+- **Interactive T.O.C**: Sidebar links MUST use smooth-scroll IDs.
 
 ## Available Templates
 
+- `templates/documentation.html` - Base HTML documentation layout
+- `templates/documentation-landing-page.html` - Premium Landing Page layout
+- `templates/style.css` - Premium styles for HTML documentation
+- `templates/landing-style.css` - Premium styles for Landing Page
+- `templates/script.js` - Interactive logic for HTML documentation
+- `templates/landing-script.js` - Interactive logic for Landing Page
 - `templates/technical-doc-template.md` - Technical documentation
 - `templates/user-guide-template.md` - User guide
 - `templates/api-doc-template.md` - API documentation
 - `templates/changelog-template.md` - Changelog template
 
-## Available Scripts
-
-- `scripts/generate-docs.sh` - Automatically generate docs from code
-- `scripts/validate-docs.py` - Validate format and completeness
-
-## Examples
-
-See `examples/` directory for reference:
-- `good-technical-doc.md` - Good technical doc example
-- `good-user-guide.md` - Good user guide example
-- `good-api-doc.md` - Good API doc example
-
 ## Links to Other Skills
 
-- **module-codebase**: Document module structure
-- **ui-ux**: Document UI components and design system
-- **content-optimization**: Optimize documentation for clarity
+- **ui-ux**: ESSENTIAL. Use this to determine the look and feel of the HTML documentation.
+- **content-optimization**: Use to ensure the text is clear and professional.

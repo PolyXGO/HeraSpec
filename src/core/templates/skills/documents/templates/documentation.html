@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>{{title}}</h3>
+            </div>
+            <ul class="list-unstyled components">
+                {{navigation_items}}
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content" class="content">
+            <header>
+                <button type="button" id="sidebarCollapse" class="btn btn-info">
+                    <span>Toggle Sidebar</span>
+                </button>
+            </header>
+
+            <div class="main-content">
+                {{main_content}}
+            </div>
+
+            <footer>
+                <p>&copy; {{year}} {{author|default:"HeraSpec"}}. All rights reserved.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

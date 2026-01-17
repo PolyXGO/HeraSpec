@@ -58,6 +58,7 @@ heraspec/skills/
 
 **WordPress:**
 - `ux-element` - Tạo các element cho Flatsome UX Builder (Lưu ý: Chuyển snake_case thành camelCase khi dùng trong AngularJS template).
+- `plugin-standard` - Tạo WordPress plugin chuẩn WordPress.org kèm Dashboard và Settings.
 - `admin-settings-page` - Tạo trang cài đặt admin.
 - `custom-post-type` - Đăng ký custom post types.
 - `shortcode` - Tạo shortcodes.
@@ -70,7 +71,7 @@ heraspec/skills/
 
 - `ui-ux` - Thiết kế giao diện và trải nghiệm người dùng.
 - `unit-test` - Viết unit tests.
-- `documents` - Viết tài liệu kỹ thuật.
+- `documents` - Viết tài liệu kỹ thuật (Hỗ trợ tạo song song Markdown & HTML tương tác)
 
 ## Ví Dụ Thực Tế
 

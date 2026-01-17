@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - Welcome</title>
+    <link rel="stylesheet" href="landing-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <span class="logo">{{title}}</span>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="documentation.html" class="btn-primary">View Docs</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-content">
+            <h1 class="fade-in">{{title}}</h1>
+            <p class="fade-in delay-1">{{description}}</p>
+            <div class="hero-btns fade-in delay-2">
+                <a href="documentation.html" class="btn-primary btn-lg">Get Started</a>
+                <a href="#features" class="btn-outline btn-lg">Learn More</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose {{title}}?</h2>
+            <div class="feature-grid">
+                {{feature_cards}}
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to dive in?</h2>
+            <p>Explore the full potential and detailed implementation guides.</p>
+            <a href="documentation.html" class="btn-primary btn-lg">View Detailed Documentation</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{year}} {{author|default:"HeraSpec"}}. Built for excellence.</p>
+        </div>
+    </footer>
+
+    <script src="landing-script.js"></script>
+</body>
+</html>

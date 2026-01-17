@@ -155,13 +155,14 @@ Description of what this skill is used for.
 - `custom-post-type` - Register custom post types
 - `shortcode` - Create shortcodes
 - `ux-element` - Create Flatsome UX Builder elements (Note: Use camelCase for snake_case options in AngularJS templates).
+- `plugin-standard` - Create a WordPress.org compliant plugin with Dashboard and Settings.
 - `rest-endpoint` - WordPress REST API endpoints
 - And many more skills...
 
 ### Cross-Cutting
 
 - `ui-ux` - UI/UX design and styling
-- `documents` - Technical and user documentation
+- `documents` - Technical and user documentation (Supports parallel Markdown & Interactive HTML generation)
 - `content-optimization` - Content and CTA optimization
 
 ## Creating a New Skill

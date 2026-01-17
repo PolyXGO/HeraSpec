@@ -23,6 +23,7 @@ export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
   'documents': {
     templateFileName: 'documents-skill.md',
     isCrossCutting: true,
+    resourceDirs: ['documents/templates'],
   },
   'content-optimization': {
     templateFileName: 'content-optimization-skill.md',
@@ -56,6 +57,12 @@ export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
     isCrossCutting: false,
     projectType: 'wordpress',
     resourceDirs: ['ux-element/templates'],
+  },
+  'wordpress:plugin-standard': {
+    templateFileName: 'wordpress-plugin-standard-skill.md',
+    isCrossCutting: false,
+    projectType: 'wordpress',
+    resourceDirs: ['wordpress-plugin-standard/templates'],
   },
 };
 
