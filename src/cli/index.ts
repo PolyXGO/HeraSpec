@@ -16,6 +16,7 @@ import { HelperCommand } from '../commands/helper.js';
 import { MakeDocsCommand } from '../commands/make-docs.js';
 import { MakeTestCommand } from '../commands/make-test.js';
 import { MakeCodeCommand } from '../commands/make-code.js';
+import { SuggestCommand } from '../commands/suggest.js';
 
 const require = createRequire(import.meta.url);
 
@@ -258,6 +259,20 @@ skillCmd
     try {
       const skillCommand = new SkillCommand();
       await skillCommand.add(skillName, options?.projectType, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+skillCmd
+  .command('update <skill-name>')
+  .description('Update an existing skill with the latest from HeraSpec templates')
+  .option('--project-type <type>', 'Specify project type for project-specific skills')
+  .action(async (skillName: string, options?: { projectType?: string }) => {
+    try {
+      const skillCommand = new SkillCommand();
+      await skillCommand.update(skillName, options?.projectType, '.');
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);

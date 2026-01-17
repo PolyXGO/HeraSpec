@@ -154,7 +154,7 @@ Description of what this skill is used for.
 - `admin-settings-page` - Create admin settings pages
 - `custom-post-type` - Register custom post types
 - `shortcode` - Create shortcodes
-- `ux-element` - Create Flatsome UX Builder elements
+- `ux-element` - Create Flatsome UX Builder elements (Note: Use camelCase for snake_case options in AngularJS templates).
 - `rest-endpoint` - WordPress REST API endpoints
 - And many more skills...
 
@@ -203,6 +203,9 @@ heraspec skill list
 # View skill details
 heraspec skill show module-codebase --project-type perfex-module
 heraspec skill show ui-ux
+
+# Update an existing skill
+heraspec skill update ux-element --project-type wordpress
 ```
 
 ## Practical Examples
@@ -222,7 +225,7 @@ When you want to create a new UI component for Flatsome, you can prompt the agen
 > 
 > **Task:** `(projectType: wordpress, skill: ux-element)`"
 
-The agent will then follow the `ux-element` skill guidelines, using the provided PHP and HTML templates to ensure real-time preview support in the UX Builder.
+The agent will then follow the `ux-element` skill guidelines, using the provided PHP and HTML templates to ensure real-time preview support in the UX Builder. **Key Technical Rule**: Variables with underscores in PHP (like `bg_color`) must be converted to camelCase in the AngularJS template (like `shortcode.options.bgColor`).
 
 ## Benefits
 

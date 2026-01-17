@@ -540,6 +540,19 @@ heraspec skill add module-codebase --project-type perfex-module
 - You can customize the skill after adding it to your project
 - Skills are project-specific, so each project needs to add skills separately
 
+### `heraspec skill update <skill-name>`
+
+Update an existing skill with the latest from HeraSpec templates.
+
+```bash
+heraspec skill update ux-element --project-type wordpress
+```
+
+**Functionality:**
+- Removes the old skill version from your project
+- Re-copies the latest templates, scripts, and `skill.md` from HeraSpec core
+- **Note**: This will overwrite any manual changes you made to the skill's `skill.md`, `templates/`, or `scripts/` directories.
+
 ### `heraspec skill repair`
 
 Repair skills structure to match HeraSpec standard.

@@ -57,7 +57,7 @@ heraspec/skills/
 ### Project-Specific (Theo Dự Án)
 
 **WordPress:**
-- `ux-element` - Tạo các element cho Flatsome UX Builder.
+- `ux-element` - Tạo các element cho Flatsome UX Builder (Lưu ý: Chuyển snake_case thành camelCase khi dùng trong AngularJS template).
 - `admin-settings-page` - Tạo trang cài đặt admin.
 - `custom-post-type` - Đăng ký custom post types.
 - `shortcode` - Tạo shortcodes.
@@ -89,7 +89,7 @@ Khi bạn muốn tạo một thành phần giao diện mới cho Flatsome, bạn
 > 
 > **Task:** `(projectType: wordpress, skill: ux-element)`"
 
-Agent sau đó sẽ tuân theo các hướng dẫn của skill `ux-element`, sử dụng các template PHP và HTML có sẵn để đảm bảo hỗ trợ xem trước thời gian thực (real-time preview) trong UX Builder.
+Agent sau đó sẽ tuân theo các hướng dẫn của skill `ux-element`, sử dụng các template PHP và HTML có sẵn để đảm bảo hỗ trợ xem trước thời gian thực (real-time preview) trong UX Builder. **Quy tắc quan trọng**: Các biến có dấu gạch dưới trong PHP (như `bg_color`) phải được chuyển sang dạng camelCase trong AngularJS template (như `shortcode.options.bgColor`).
 
 ## Lệnh CLI
 
@@ -99,6 +99,9 @@ heraspec skill list
 
 # Thêm một skill vào dự án
 heraspec skill add ux-element --project-type wordpress
+
+# Cập nhật một skill đã có
+heraspec skill update ux-element --project-type wordpress
 ```
 
 ## Xem Thêm

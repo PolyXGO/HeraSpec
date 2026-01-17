@@ -65,6 +65,12 @@ Every UX Builder template MUST follow this structure:
 </span>
 ```
 
+### Variable Naming (PHP vs AngularJS)
+**CRITICAL**: When accessing shortcode options in the AngularJS template (`.html`), variables declared with underscores (`_`) in PHP MUST be accessed via **camelCase**.
+- **PHP**: `bg_color` → **AngularJS**: `shortcode.options.bgColor`
+- **PHP**: `pxg_clock_font` → **AngularJS**: `shortcode.options.pxgClockFont`
+- **PHP**: `text_align` → **AngularJS**: `shortcode.options.textAlign`
+
 ### Color Handling
 - Use HEX or RGBA strings consistently.
 - Always provide default values in the shortcode registration or handle them in the template/controller.

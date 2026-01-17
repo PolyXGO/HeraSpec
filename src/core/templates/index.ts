@@ -113,6 +113,7 @@ This document defines the workflow for AI agents working with HeraSpec.
 - Agent MUST follow the **Wrapping Rule**: Use \`<span>\` with \`id="{{:: shortcode.$id }}"\`
 - Agent uses templates from \`heraspec/skills/wordpress/ux-element/templates/\` (Controller, Shortcode, HTML Template, SVG Thumbnail)
 - Agent ensures real-time preview support in AngularJS template.
+- **Variable Translation**: Variables with underscores in PHP (e.g., \`bg_color\`) MUST be accessed via camelCase in AngularJS (e.g., \`shortcode.options.bgColor\`).
 
 - Follow tasks.md
 - Mark tasks completed: \`- [x]\`
@@ -259,6 +260,7 @@ export const SKILLS_SECTION_TEMPLATE = `## Skills System
 - Agent MUST follow the **Wrapping Rule**: Use \`<span>\` with \`id="{{:: shortcode.$id }}"\`
 - Agent uses templates from \`heraspec/skills/wordpress/ux-element/templates/\` (Controller, Shortcode, HTML Template, SVG Thumbnail)
 - Agent ensures real-time preview support in AngularJS template.
+- **Variable Translation**: Variables with underscores in PHP (e.g., \`bg_color\`) MUST be accessed via camelCase in AngularJS (e.g., \`shortcode.options.bgColor\`).
 
 ### Skill Discovery
 

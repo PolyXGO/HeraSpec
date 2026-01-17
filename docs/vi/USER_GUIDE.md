@@ -537,8 +537,21 @@ heraspec skill add module-codebase --project-type perfex-module
 **Lưu ý quan trọng:**
 - Skills được copy từ HeraSpec core templates, nên bạn có phiên bản mới nhất
 - Nếu skill có resources (scripts, templates, data), chúng sẽ được tự động copy
-- Bạn có thể tùy chỉnh skill sau khi thêm vào project
-- Skills là project-specific, nên mỗi project cần thêm skills riêng biệt
+- Bạn có thể tùy chỉnh skill sau khi đã thêm vào dự án
+- Skill đi theo từng dự án, nên mỗi dự án cần thêm skill riêng biệt
+
+### `heraspec skill update <skill-name>`
+
+Cập nhật một skill đã có bằng phiên bản mới nhất từ HeraSpec templates.
+
+```bash
+heraspec skill update ux-element --project-type wordpress
+```
+
+**Chức năng:**
+- Xóa phiên bản skill cũ trong dự án của bạn
+- Copy lại các template, script và `skill.md` mới nhất từ HeraSpec core
+- **Lưu ý**: Lệnh này sẽ ghi đè lên bất kỳ thay đổi thủ công nào bạn đã thực hiện trong thư mục `skill.md`, `templates/`, hoặc `scripts/` của skill đó.
 
 ### `heraspec skill repair`
 

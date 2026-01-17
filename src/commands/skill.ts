@@ -416,4 +416,9 @@ export class SkillCommand {
       process.exitCode = 1;
     }
   }
+
+  async update(skillName: string, projectType?: string, projectPath: string = '.'): Promise<void> {
+    // The internal logic of add already handles updating existing skills by removing the old version first
+    return this.add(skillName, projectType, projectPath);
+  }
 }
