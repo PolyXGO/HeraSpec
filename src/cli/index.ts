@@ -134,6 +134,19 @@ program
   });
 
 program
+  .command('skills')
+  .description('List all available skills (shortcut for skill list)')
+  .action(async () => {
+    try {
+      const skillCommand = new SkillCommand();
+      await skillCommand.list('.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+program
   .command('helper')
   .description('Show usage guide, example prompts, and workflow instructions')
   .action(async () => {

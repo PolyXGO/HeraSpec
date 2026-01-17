@@ -45,6 +45,7 @@ export class HelperCommand {
       { cmd: 'heraspec init [path]', desc: 'Initialize HeraSpec in project' },
       { cmd: 'heraspec list', desc: 'List changes (default)' },
       { cmd: 'heraspec list --specs', desc: 'List specs' },
+      { cmd: 'heraspec skills', desc: 'List all available skills (shortcut)' },
       { cmd: 'heraspec show [name]', desc: 'Show change or spec details' },
       { cmd: 'heraspec validate [name]', desc: 'Validate change or spec' },
       { cmd: 'heraspec archive [name]', desc: 'Archive completed change' },
@@ -97,18 +98,25 @@ export class HelperCommand {
     console.log(chalk.gray('   "Validate change add-user-auth --strict"\n'));
     console.log(chalk.gray('   "List all changes"\n'));
 
-           console.log(chalk.white.bold('6. Implementation:\n'));
-           console.log(chalk.gray('   "Specs approved, start implementing change add-user-auth"\n'));
-           console.log(chalk.gray('   "Execute tasks in change add-user-auth"\n'));
+    console.log(chalk.white.bold('6. Implementation:\n'));
+    console.log(chalk.gray('   "Specs approved, start implementing change add-user-auth"\n'));
+    console.log(chalk.gray('   "Execute tasks in change add-user-auth"\n'));
 
-           console.log(chalk.white.bold('7. Generate Documentation:\n'));
-           console.log(chalk.gray('   "Generate product documentation from specs"\n'));
-           console.log(chalk.gray('   heraspec make docs\n'));
-           console.log(chalk.gray('   "Generate docs with specific AI agent"\n'));
-           console.log(chalk.gray('   heraspec make docs --agent chatgpt\n'));
-           console.log(chalk.gray('   heraspec make docs --agent claude\n'));
+    console.log(chalk.white.bold('7. Generate Documentation:\n'));
+    console.log(chalk.gray('   "Generate product documentation from specs"\n'));
+    console.log(chalk.gray('   heraspec make docs\n'));
+    console.log(chalk.gray('   "Generate docs with specific AI agent"\n'));
+    console.log(chalk.gray('   heraspec make docs --agent chatgpt\n'));
+    console.log(chalk.gray('   heraspec make docs --agent claude\n'));
+    
+    console.log(chalk.white.bold('8. Multi-Format Documentation (Skill: Documents):\n'));
+    console.log(chalk.gray('   "Generate documentation with skill documents. Include:\n'));
+    console.log(chalk.gray('    - Standard Markdown file (.md)\n'));
+    console.log(chalk.gray('    - Interactive HTML Documentation (panel layout)\n'));
+    console.log(chalk.gray('    - Premium Documentation Landing Page (visual showcase)"\n'));
+    console.log(chalk.gray('   "Use documents skill to create parallel MD and Landing Page"\n'));
 
-           console.log('─'.repeat(70) + '\n');
+    console.log('─'.repeat(70) + '\n');
   }
 
   private showWorkflow(): void {
