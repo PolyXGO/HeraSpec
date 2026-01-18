@@ -274,12 +274,26 @@ Example with multiple skills in one change:
 **Key rule**: Switch skill.md when switching task groups!
 `;
 
+export const CONFIG_TEMPLATE = `projectType: generic-webapp
+projectName: "HeraSpec Project"
+description: "A new project using HeraSpec"
+skills: []
+`;
+
 export class TemplateManager {
   static getProjectTemplate(): string {
     return PROJECT_TEMPLATE;
   }
 
+  static getConfigTemplate(): string {
+    return CONFIG_TEMPLATE;
+  }
+
   static getAgentsTemplate(): string {
     return AGENTS_TEMPLATE;
+  }
+
+  static getSkillsSection(): string {
+    return SKILLS_SECTION_TEMPLATE;
   }
 }
