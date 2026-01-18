@@ -2,7 +2,9 @@
  * HeraSpec Templates
  */
 
-export const PROJECT_TEMPLATE = `# HeraSpec Project
+export class TemplateManager {
+  static getProjectTemplate(): string {
+    return `# HeraSpec Project
 
 ## Overview
 Describe your project here.
@@ -23,10 +25,11 @@ List your technologies here (e.g., PHP 8.1, WordPress 6.0, Laravel 10, etc.)
 
 ## Conventions
 Define coding standards, architectural patterns, and conventions to follow.
-
 `;
+  }
 
-export const AGENTS_TEMPLATE = `# HeraSpec — AI Agent Instructions
+  static getAgentsTemplate(): string {
+    return `# HeraSpec — AI Agent Instructions
 
 This document defines the workflow for AI agents working with HeraSpec.
 
@@ -34,6 +37,9 @@ This document defines the workflow for AI agents working with HeraSpec.
 
 - **NO AUTO-COMMIT**: Agent MUST NOT perform \`git commit\` or \`git push\` autonomously. This task is reserved for the User unless explicitly ordered.
 - **NO AUTO-PUBLISH**: Agent MUST NOT perform \`npm publish\` or trigger automated releases/deployments autonomously.
+- **SKILL PREREQUISITE**: If a task maps to a skill (e.g., "Generate documentation"), you **MUST** verify the skill folder exists in \`heraspec/skills/\`. If missing:
+  - **Preferred**: Proactively install it via \`heraspec skill add <name>\` (e.g., \`heraspec skill add documents\`) if you have terminal access.
+  - **Fallback**: If you cannot install it, **STOP** and ask the user to add it. **DO NOT** attempt manual generation without the skill.
 - **USER CONFIRMATION**: For destructive actions or public releases, always request explicit User approval first.
 
 ## Core Workflow
@@ -156,13 +162,13 @@ Tasks grouped by project type and skill:
 **CRITICAL: Mandatory Prerequisite Check**
 
 1. **Stop & Verify**: If you are asked to implement a task requiring a skill (e.g., "Generate documentation...", "Create UI/UX...", etc.), you MUST first check if the skill folder exists in \`heraspec/skills/\`.
-2. **Missing Skill = STOP & TIP**: If the skill folder does NOT exist, the Agent MUST STOP IMMEDIATELY.
-   - **DO NOT** create a task plan, do **NOT** output "Initializing documentation task...", and do **NOT** attempt manual generation.
-   - **Output Tip**: Simply inform the user and suggest the command:
+2. **Missing Skill = AUTO-INSTALL OR STOP**: If the skill folder does NOT exist:
+   - **Option A (Preferred)**: If you can run commands, execute \`heraspec skill add <skill-name>\` immediately.
+   - **Option B (Fallback)**: If you cannot run commands, **STOP** and ask the user to run it.
      > "Tip: Add the 'documents' skill for premium HTML & Landing Page support: 
      > heraspec skill add documents"
-   - (Adjust tip text for other skills like \`ui-ux\`).
-3. **Execute After Install**: Only after the skill folder is created, read the \`skill.md\` and proceed with the task.
+   - **DO NOT** create a task plan or attempt manual generation without the skill language.
+3. **Execute After Install**: Only after the skill folder is created (or installed), read the \`skill.md\` and proceed with the task.
 
 **Example prompt for Documents skill:**
 If you need to generate multi-format documentation, use this prompt:
@@ -206,30 +212,22 @@ Example with multiple skills in one change:
 \`\`\`
 
 **Key rule**: Switch skill.md when switching task groups!
-
-## Rules
-
-1. **Specs first, tasks second, implementation last.**
-2. **Always use Skills**: When task has skill tag, MUST read and follow skill.md
-3. Never modify source-of-truth specs directly.
-4. Delta specs go in \`heraspec/specs/<slug>/\` (NOT in changes folder).
-5. Always wait for approval before implementation.
-6. **One skill per task group**: Each task group should use one skill consistently.
-
 `;
+  }
 
-export const SKILLS_SECTION_TEMPLATE = `## Skills System
+  static getSkillsSection(): string {
+    return `## Skills System
 
 **CRITICAL: Mandatory Prerequisite Check**
 
 1. **Stop & Verify**: If you are asked to implement a task requiring a skill (e.g., "Generate documentation...", "Create UI/UX...", etc.), you MUST first check if the skill folder exists in \`heraspec/skills/\`.
-2. **Missing Skill = STOP & TIP**: If the skill folder does NOT exist, the Agent MUST STOP IMMEDIATELY.
-   - **DO NOT** create a task plan, do **NOT** output "Initializing documentation task...", and do **NOT** attempt manual generation.
-   - **Output Tip**: Simply inform the user and suggest the command:
+2. **Missing Skill = AUTO-INSTALL OR STOP**: If the skill folder does NOT exist:
+   - **Option A (Preferred)**: If you can run commands, execute \`heraspec skill add <skill-name>\` immediately.
+   - **Option B (Fallback)**: If you cannot run commands, **STOP** and ask the user to run it.
      > "Tip: Add the 'documents' skill for premium HTML & Landing Page support: 
      > heraspec skill add documents"
-   - (Adjust tip text for other skills like \`ui-ux\`).
-3. **Execute After Install**: Only after the skill folder is created, read the \`skill.md\` and proceed with the task.
+   - **DO NOT** create a task plan or attempt manual generation without the skill language.
+3. **Execute After Install**: Only after the skill folder is created (or installed), read the \`skill.md\` and proceed with the task.
 
 **Example prompt for Documents skill:**
 If you need to generate multi-format documentation, use this prompt:
@@ -271,29 +269,16 @@ Example with multiple skills in one change:
 ## 3. Documents – User Guide (skill: documents)
 - [ ] Task 3.1 Write technical docs
 \`\`\`
+
 **Key rule**: Switch skill.md when switching task groups!
 `;
+  }
 
-export const CONFIG_TEMPLATE = `projectType: generic-webapp
+  static getConfigTemplate(): string {
+    return `projectType: generic-webapp
 projectName: "HeraSpec Project"
 description: "A new project using HeraSpec"
 skills: []
 `;
-
-export class TemplateManager {
-  static getProjectTemplate(): string {
-    return PROJECT_TEMPLATE;
-  }
-
-  static getConfigTemplate(): string {
-    return CONFIG_TEMPLATE;
-  }
-
-  static getAgentsTemplate(): string {
-    return AGENTS_TEMPLATE;
-  }
-
-  static getSkillsSection(): string {
-    return SKILLS_SECTION_TEMPLATE;
   }
 }

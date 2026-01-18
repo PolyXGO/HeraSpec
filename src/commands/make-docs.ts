@@ -69,7 +69,8 @@ export class MakeDocsCommand {
         if (hasUIUXSkill) {
           console.log(chalk.gray('    - Apply premium design from the ui-ux skill standards"'));
         } else {
-          console.log(chalk.gray('    - Apply premium modern design standards"'));
+          console.log(chalk.yellow('    - WARNING: "ui-ux" skill is MISSING but required for HTML/Landing Page.'));
+          console.log(chalk.gray('    - Agent must install it first: heraspec skill add ui-ux"'));
         }
       } else {
         console.log(chalk.yellow('\n💡 Tip: Add the "documents" skill for premium HTML & Landing Page support:'));

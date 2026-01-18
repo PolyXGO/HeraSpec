@@ -15,7 +15,7 @@ Every documentation task should ideally generate four versions:
 
 ### 2. Dynamic Design (Not Fixed Templates)
 - **Do NOT follow a rigid template**: The Agent must **design** the documentation layout and content structure specifically for the project.
-- **Synergy with ui-ux**: Use the `ui-ux` skill to define the visual language.
+- **Synergy with ui-ux**: use of the `ui-ux` skill is **MANDATORY** for `documentation.html` and `documentation-landing-page.html`.
 
 ### 3. Standard Quality Structure (Mandatory)
 To ensure clarity and completeness, the generated documentation MUST include:
@@ -50,8 +50,11 @@ When tasked with generating documentation for the entire project:
 
 ### Step 1: Intelligence Gathering & Design Planning
 1. **Analyze Project**: Scan all relevant `.md` files in the project. Understand the core purpose and technical details.
-2. **Define Design System**: Consult the `ui-ux` skill to establish a visual language (colors, fonts, animation styles).
-3. **Plan Structures**: Outline what needs to go into the `.txt`, `.md`, and `.html` versions.
+2. **Enforce UI/UX Dependency**:
+   - Check if `heraspec/skills/ui-ux/` exists.
+   - If missing: **Execute `heraspec skill add ui-ux`** immediately. Do NOT proceed with HTML generation until this skill is available.
+3. **Define Design System**: Consult the `ui-ux` skill to establish a visual language (colors, fonts, animation styles).
+4. **Plan Structures**: Outline what needs to go into the `.txt`, `.md`, and `.html` versions.
 
 ### Step 2: Constructing Documentation Assets
 1. **Compose documentation.txt & .md**: Focus on clarity and technical accuracy.

@@ -147,13 +147,15 @@ export class InitCommand {
     // Get the latest Skills section template
     const latestSkillsSection = await this.getSkillsSection();
     
-    // Also include Universal Safety Rules if missing
+    // Guarantee Universal Safety Rules are up to date
     const safetyMarker = '## Universal Safety Rules';
-    if (!existingContent.includes(safetyMarker)) {
-        const fullTemplate = TemplateManager.getAgentsTemplate();
-        const safetyEndIndex = fullTemplate.indexOf('## Core Workflow');
-        const safetySection = fullTemplate.substring(fullTemplate.indexOf(safetyMarker), safetyEndIndex).trim();
-        
+    const fullTemplate = TemplateManager.getAgentsTemplate();
+    const safetyEndIndex = fullTemplate.indexOf('## Core Workflow');
+    const safetySection = fullTemplate.substring(fullTemplate.indexOf(safetyMarker), safetyEndIndex).trim();
+
+    if (existingContent.includes(safetyMarker)) {
+        existingContent = this.replaceSafetyRules(existingContent, safetySection);
+    } else {
         // Insert at the beginning or after header
         if (existingContent.startsWith('# ')) {
             const firstLineEnd = existingContent.indexOf('\n') + 1;
@@ -208,6 +210,24 @@ export class InitCommand {
     const before = existingContent.substring(0, startIndex).trimEnd();
     const after = existingContent.substring(endIndex);
     return before + '\n\n' + newSkillsSection + (after.trimStart().startsWith('\n') ? '' : '\n\n') + after;
+  }
+
+  private replaceSafetyRules(existingContent: string, newSafetySection: string): string {
+    const marker = '## Universal Safety Rules';
+    const startIndex = existingContent.indexOf(marker);
+    
+    if (startIndex === -1) return existingContent;
+
+    // Find end of section (next ## header)
+    let endIndex = existingContent.indexOf('\n## ', startIndex + marker.length);
+    if (endIndex === -1) {
+        endIndex = existingContent.length;
+    }
+
+    const before = existingContent.substring(0, startIndex).trimEnd();
+    const after = existingContent.substring(endIndex);
+    
+    return before + '\n\n' + newSafetySection + (after.trimStart().startsWith('\n') ? '' : '\n\n') + after;
   }
 
   private appendSkillsSection(existingContent: string, skillsSection: string): string {
