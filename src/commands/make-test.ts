@@ -173,10 +173,16 @@ export class MakeTestCommand {
     const createdFiles: string[] = [];
 
     for (const spec of specs) {
-      const testContent = this.generateTestContent(spec, testType, projectInfo);
       const testFileName = this.getTestFileName(spec.name, testType, projectInfo);
       const testFilePath = path.join(testDir, testFileName);
 
+      // Check if file already exists
+      if (await FileSystemUtils.fileExists(testFilePath)) {
+        console.log(chalk.yellow(`  ℹ Skipping ${path.basename(testFilePath)} - already exists.`));
+        continue;
+      }
+
+      const testContent = this.generateTestContent(spec, testType, projectInfo);
       await FileSystemUtils.writeFile(testFilePath, testContent);
       createdFiles.push(testFilePath);
     }

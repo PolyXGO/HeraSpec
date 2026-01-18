@@ -1,6 +1,6 @@
 {
   "name": "heraspec",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Universal spec-first development framework + CLI for all project types and AI tools",
   "keywords": [
     "heraspec",
@@ -40,6 +40,8 @@
   "files": [
     "dist",
     "bin",
+    "README.md",
+    "LICENSE",
     "!dist/**/*.test.js",
     "!dist/**/__tests__",
     "!dist/**/*.map"
