@@ -15,7 +15,7 @@ export class MakeDocsCommand {
     try {
       const resolvedPath = path.resolve(projectPath);
       const specsDir = path.join(resolvedPath, HERASPEC_DIR_NAME, SPECS_DIR_NAME);
-      const docsDir = path.join(resolvedPath, 'documentation');
+      const docsDir = path.join(resolvedPath, 'documentations');
       const projectMdPath = path.join(resolvedPath, HERASPEC_DIR_NAME, HERASPEC_MARKERS.PROJECT_MD);
 
       // Check if specs directory exists
@@ -35,6 +35,10 @@ export class MakeDocsCommand {
         projectInfo = this.extractProjectInfo(projectContent);
       }
 
+      // Check for Skills
+      const hasDocumentsSkill = await FileSystemUtils.fileExists(path.join(resolvedPath, HERASPEC_DIR_NAME, 'skills', 'documents'));
+      const hasUIUXSkill = await FileSystemUtils.fileExists(path.join(resolvedPath, HERASPEC_DIR_NAME, 'skills', 'ui-ux'));
+
       // Find all spec files
       const specFiles = await this.findSpecFiles(specsDir);
 
@@ -50,10 +54,28 @@ export class MakeDocsCommand {
       const docContent = this.generateProductDocumentation(specs, projectInfo, agent);
 
       // Write documentation file
-      const docFilePath = path.join(docsDir, 'product-documentation.txt');
+      const docFilePath = path.join(docsDir, 'documentation.txt');
       await FileSystemUtils.writeFile(docFilePath, docContent);
 
-      spinner.succeed(`Product documentation generated: ${docFilePath}`);
+      spinner.succeed(`Basic documentation generated: ${docFilePath}`);
+
+      if (hasDocumentsSkill) {
+        console.log(chalk.green.bold('\n✨ Documents Skill Detected!'));
+        console.log(chalk.white('AI Agent Instruction:'));
+        console.log(chalk.gray('   "Now use the documents skill to generate the full multi-format package:'));
+        console.log(chalk.gray('    - Use documentation.txt as context'));
+        console.log(chalk.gray('    - Create documentation.md, documentation.html, and landing page'));
+        console.log(chalk.gray('    - CRITICAL: Save all files in the /documentations directory (create it if missing)'));
+        if (hasUIUXSkill) {
+          console.log(chalk.gray('    - Apply premium design from the ui-ux skill standards"'));
+        } else {
+          console.log(chalk.gray('    - Apply premium modern design standards"'));
+        }
+      } else {
+        console.log(chalk.yellow('\n💡 Tip: Add the "documents" skill for premium HTML & Landing Page support:'));
+        console.log(chalk.gray('   heraspec skill add documents'));
+      }
+
       console.log(chalk.gray(`\nFound ${specFiles.length} feature(s)`));
     } catch (error) {
       spinner.fail(`Error: ${(error as Error).message}`);

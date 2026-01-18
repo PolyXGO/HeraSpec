@@ -7,57 +7,82 @@ This skill is used to create comprehensive documentation for both technical and 
 ## Core Requirements
 
 ### 1. Multi-Format Output
-Every documentation task should ideally generate three versions:
-- `doc-name.md`: Clean Markdown for version control.
-- `doc-name.html`: Interactive HTML with a modern split-panel layout for deep reading.
-- `documentation-landing-page.html`: A high-end, visual landing page to showcase features and provide entry points.
+Every documentation task should ideally generate four versions:
+- `documentation.txt`: A concise, text-only overview for quick reading and AI context.
+- `documentation.md`: High-quality Markdown for version control and GitHub READMEs.
+- `documentation.html`: An interactive, premium documentation page with sidebar navigation.
+- `documentation-landing-page.html`: A visual, high-end landing page to showcase the project/plugin.
 
-### 2. HTML Layout (Premium Standard)
-- **Documentation Page**: Split-panel (Sidebar for Nav, Content for reading). Smooth scroll-spy included.
-- **Landing Page**: Full-screen Hero section, feature grids with hover effects, and clear Calls to Action (CTA).
+### 2. Dynamic Design (Not Fixed Templates)
+- **Do NOT follow a rigid template**: The Agent must **design** the documentation layout and content structure specifically for the project.
+- **Synergy with ui-ux**: Use the `ui-ux` skill to define the visual language.
 
-### 3. Visual Excellence
-- Use the `ui-ux` skill to determine the theme colors, typography gradients, and spacing.
-- The Landing Page must include scroll animations (fade-in, transform) to feel premium and alive.
+### 3. Standard Quality Structure (Mandatory)
+To ensure clarity and completeness, the generated documentation MUST include:
+
+#### A. Interactive Documentation (documentation.html)
+1.  **Quick Start**: Clear steps to get running in < 2 minutes.
+2.  **System Requirements**: OS, versions, dependencies.
+3.  **Installation & Setup**: Detailed step-by-step guide.
+4.  **Configuration**: Explanation of all settings (config files, UI settings).
+5.  **Core Features**: Deep dive into each component found in `heraspec/specs/`.
+6.  **Technical Reference**: (For Devs) API endpoints, Hooks, Filters, Functions.
+7.  **Troubleshooting & FAQ**: Common issues and solutions.
+
+#### B. Premium Landing Page (documentation-landing-page.html)
+1.  **Hero Section**: High-impact headline and clear sub-headline.
+2.  **Value Proposition**: Briefly explain "The Problem" vs "The Solution".
+3.  **Feature Showcase**: A visual grid of key benefits with icons/images.
+4.  **How It Works**: A simplified 1-2-3 step process of using the project.
+5.  **CTA (Call to Action)**: Prominent buttons to "Get Started" or "View Docs".
+
+### 4. Visual Excellence
+- Use gradients, smooth animations (fade-in, slide), and premium fonts (e.g., Inter, Montserrat).
+- The HTML documentation should feel like a modern SaaS dashboard or a high-end technical manual.
+
+### 4. Project-Wide Scope
+When tasked with generating documentation for the entire project:
+- **Data Source**: Agent MUST read `heraspec/project.md` and ALL files in `heraspec/specs/`.
+- **Synthesis**: Agent must combine information from all components and features into a unified manual.
+- **Landing Page**: Should serve as the project homepage, summarizing the main value proposition and key features across all modules.
 
 ## Implementation Steps
 
-### Step 1: Define Content and Flow
-1. Outline the main technical content for the `.md` and `.html` docs.
-2. Identify the "Key Features" and "USP" (Unique Selling Points) for the Landing Page feature grid.
+### Step 1: Intelligence Gathering & Design Planning
+1. **Analyze Project**: Scan all relevant `.md` files in the project. Understand the core purpose and technical details.
+2. **Define Design System**: Consult the `ui-ux` skill to establish a visual language (colors, fonts, animation styles).
+3. **Plan Structures**: Outline what needs to go into the `.txt`, `.md`, and `.html` versions.
 
-### Step 2: Generate Markdown & Documentation HTML
-1. Populate `technical-doc-template.md` (or user guide).
-2. Populate `documentation.html` with navigation and sections.
-
-### Step 3: Integrate Landing Page
-1. Use `templates/documentation-landing-page.html`.
-2. **Hero Section**: Write a compelling headline and description.
-3. **Feature Grid**: Create cards for each major feature using `<div class="feature-card">`.
-4. **Integration**: Link the CTA buttons to `documentation.html`.
-5. Apply `landing-style.css` and `landing-script.js`.
+### Step 2: Constructing Documentation Assets
+1. **Compose documentation.txt & .md**: Focus on clarity and technical accuracy.
+2. **Develop documentation.html**: Build a split-panel layout (Sidebar + Content). DO NOT just fill a template; **write the HTML/CSS/JS** needed to make it look premium and project-specific.
+3. **Design documentation-landing-page.html**: Create a compelling Hero section and feature showcase. Link to the main docs.
 
 ## Required Input
 
-- **Document type**: Technical, user guide, API, changelog
-- **Target audience**: Developers, end-users, admins
-- **Structural Outline**: List of headings and sub-headings
-- **Design Cues**: Colors and icons from `ui-ux` skill
+- **Project Context**: The name of the plugin/project (e.g., "polyutilities").
+- **Specs/Docs**: All existing documentation and specification files.
+- **Design Guidelines**: Inputs from the `ui-ux` skill.
 
-## Expected Output
+## Expected Output (Save to /documentations/)
 
-- `file.md`: Complete documentation in Markdown.
-- `file.html`: Interactive split-panel HTML documentation.
-- `style.css`: Documentation styles.
-- `script.js`: Documentation interactivity.
+**CRITICAL**: All files MUST be placed in a `/documentations` folder at the project root. If this folder does not exist, the Agent MUST create it first.
+
+- `/documentations/documentation.txt`: Plain text overview.
+- `/documentations/documentation.md`: Markdown version.
+- `/documentations/documentation.html`: Interactive split-panel HTML.
+- `/documentations/documentation-landing-page.html`: Visual landing page.
+- `/documentations/style.css` & `/documentations/landing-style.css`: Custom-generated styles.
+- `/documentations/script.js` & `/documentations/landing-script.js`: Interactive logic.
 
 ## Tone & Rules
 
-- **Consistent Content**: The content in MD and HTML MUST be identical in substance.
-- **No Inline Bloat**: Keep CSS and JS in separate files as provided in the templates.
-- **Interactive T.O.C**: Sidebar links MUST use smooth-scroll IDs.
+- **Consistent Content**: The core information must be synchronized across all formats.
+- **Design Autonomy**: The Agent is responsible for the final aesthetic and structural quality.
+- **Visual Impact**: Documentation must WOW the user with its premium feel.
 
-## Available Templates
+## Reference Templates
+These are provided as starting points or inspiration. The Agent should feel free to expand or modify them to suit the project:
 
 - `templates/documentation.html` - Base HTML documentation layout
 - `templates/documentation-landing-page.html` - Premium Landing Page layout

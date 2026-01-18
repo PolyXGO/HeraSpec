@@ -110,11 +110,12 @@ export class HelperCommand {
     console.log(chalk.gray('   heraspec make docs --agent claude\n'));
     
     console.log(chalk.white.bold('8. Multi-Format Documentation (Skill: Documents):\n'));
-    console.log(chalk.gray('   "Generate documentation with skill documents. Include:\n'));
-    console.log(chalk.gray('    - Standard Markdown file (.md)\n'));
-    console.log(chalk.gray('    - Interactive HTML Documentation (panel layout)\n'));
-    console.log(chalk.gray('    - Premium Documentation Landing Page (visual showcase)"\n'));
-    console.log(chalk.gray('   "Use documents skill to create parallel MD and Landing Page"\n'));
+    console.log(chalk.gray('   "Generate documentation with skill documents for [project-name]. Include:\n'));
+    console.log(chalk.gray('    - Concise overview (documentation.txt)\n'));
+    console.log(chalk.gray('    - Technical Markdown (documentation.md)\n'));
+    console.log(chalk.gray('    - Interactive HTML Documentation (documentation.html)\n'));
+    console.log(chalk.gray('    - Premium Documentation Landing Page (documentation-landing-page.html)"\n'));
+    console.log(chalk.gray('   "Use documents skill to create dynamic, project-specific docs"\n'));
 
     console.log('─'.repeat(70) + '\n');
   }
@@ -168,11 +169,12 @@ export class HelperCommand {
       {
         step: '6. Generate Documentation',
         actions: [
-          'Generate product docs: heraspec make docs',
-          'With specific agent: heraspec make docs --agent <name>',
-          'Output: documentation/product-documentation.txt',
+          'Generate basic docs: heraspec make docs',
+          'Use Skill Documents: "Generate documentation with skill documents"',
+          'Outputs: documentation.txt, .md, .html, and landing-page.html',
+          'Agent uses ui-ux skill for premium dynamic design',
         ],
-        prompt: 'heraspec make docs --agent chatgpt',
+        prompt: '"Generate documentation with skill documents for polyutilities"',
       },
     ];
 
@@ -201,6 +203,8 @@ export class HelperCommand {
       'Archive change after completion to merge specs',
       'Use heraspec skill list to view available skills',
       'UI/UX tasks: Use search scripts in skill ui-ux',
+      'Premium Documentation: Use "skill documents" for txt, md, html, and landing page',
+      'Dynamic Docs: Documents skill generates custom layouts based on your project specs',
       'Generate product docs: heraspec make docs (default agent: chatgpt)',
       'Specify AI agent: heraspec make docs --agent <name> (chatgpt, claude, etc.)',
       'Generate tests: heraspec make test (default: unit)',

@@ -56,9 +56,16 @@ export class InitCommand {
       // Create template files
       await this.createTemplateFiles(heraspecPath, alreadyInitialized);
 
-      // Create or update root AGENTS.heraspec.md (merge Skills section if exists)
-      const agentsPath = path.join(resolvedPath, HERASPEC_MARKERS.AGENTS_MD);
-      await this.updateAgentsFile(agentsPath, alreadyInitialized);
+      // Migration: Check for AGENTS.md and rename it to AGENTS.heraspec.md
+      const legacyAgentsPath = path.join(resolvedPath, 'AGENTS.md');
+      const newAgentsPath = path.join(resolvedPath, HERASPEC_MARKERS.AGENTS_MD);
+      
+      if (await FileSystemUtils.fileExists(legacyAgentsPath) && !(await FileSystemUtils.fileExists(newAgentsPath))) {
+          await FileSystemUtils.moveFile(legacyAgentsPath, newAgentsPath);
+      }
+
+      // Create or update root AGENTS.md (merge Skills section if exists)
+      await this.updateAgentsFile(newAgentsPath, alreadyInitialized);
 
       // Update related markdown files (README.md, etc.)
       await this.updateRelatedMarkdownFiles(resolvedPath);
@@ -114,7 +121,6 @@ export class InitCommand {
 
   private async updateAgentsFile(agentsPath: string, alreadyInitialized: boolean): Promise<void> {
     const skillsSectionMarker = '## Skills System';
-    const skillsSectionEndMarker = '**Key rule**: Switch skill.md when switching task groups!';
 
     if (!alreadyInitialized) {
       // New project: create full template
@@ -125,39 +131,76 @@ export class InitCommand {
       return;
     }
 
-    // Existing project: merge Skills section
+    // Existing project: merge or overwrite Skills section to ensure latest rules are applied
     let existingContent = '';
     if (await FileSystemUtils.fileExists(agentsPath)) {
       existingContent = await FileSystemUtils.readFile(agentsPath);
+    } else {
+      // Root AGENTS.md missing but project initialized? Create it.
+      await FileSystemUtils.writeFile(
+        agentsPath,
+        TemplateManager.getAgentsTemplate()
+      );
+      return;
     }
 
-    // Check if Skills section already exists
-    if (existingContent.includes(skillsSectionMarker)) {
-      // Update existing Skills section
-      const skillsSection = await this.getSkillsSection();
-      const updatedContent = this.replaceSkillsSection(existingContent, skillsSection);
-      await FileSystemUtils.writeFile(agentsPath, updatedContent);
+    // Get the latest Skills section template
+    const latestSkillsSection = await this.getSkillsSection();
+    
+    // Also include Universal Safety Rules if missing
+    const safetyMarker = '## Universal Safety Rules';
+    if (!existingContent.includes(safetyMarker)) {
+        const fullTemplate = TemplateManager.getAgentsTemplate();
+        const safetyEndIndex = fullTemplate.indexOf('## Core Workflow');
+        const safetySection = fullTemplate.substring(fullTemplate.indexOf(safetyMarker), safetyEndIndex).trim();
+        
+        // Insert at the beginning or after header
+        if (existingContent.startsWith('# ')) {
+            const firstLineEnd = existingContent.indexOf('\n') + 1;
+            existingContent = existingContent.substring(0, firstLineEnd) + '\n' + safetySection + '\n\n' + existingContent.substring(firstLineEnd);
+        } else {
+            existingContent = safetySection + '\n\n' + existingContent;
+        }
+    }
+
+    // Update Skills section
+    let updatedContent = existingContent;
+    if (existingContent.includes(skillsSectionMarker) || existingContent.includes('## Skills system')) {
+      updatedContent = this.replaceSkillsSection(existingContent, latestSkillsSection);
     } else {
-      // Append Skills section before "## Rules" or at the end
-      const skillsSection = await this.getSkillsSection();
-      const updatedContent = this.appendSkillsSection(existingContent, skillsSection);
-      await FileSystemUtils.writeFile(agentsPath, updatedContent);
+      updatedContent = this.appendSkillsSection(existingContent, latestSkillsSection);
+    }
+    
+    if (updatedContent !== existingContent) {
+        await FileSystemUtils.writeFile(agentsPath, updatedContent);
     }
   }
 
   private replaceSkillsSection(existingContent: string, newSkillsSection: string): string {
-    const startMarker = '## Skills System';
+    const startMarkers = ['## Skills System', '## Skills system', '### Skills System', '### Skills system'];
     
-    const startIndex = existingContent.indexOf(startMarker);
+    let startIndex = -1;
+    let foundMarker = '';
+    
+    for (const marker of startMarkers) {
+        startIndex = existingContent.indexOf(marker);
+        if (startIndex !== -1) {
+            foundMarker = marker;
+            break;
+        }
+    }
+
     if (startIndex === -1) {
       return this.appendSkillsSection(existingContent, newSkillsSection);
     }
 
     // Find the end of Skills section (before next ## section or end of file)
-    // Look for next ## that is not part of Skills section
-    let endIndex = existingContent.indexOf('\n## ', startIndex + startMarker.length);
+    let endIndex = existingContent.indexOf('\n## ', startIndex + foundMarker.length);
     if (endIndex === -1) {
-      // No next section, replace to end of file
+      endIndex = existingContent.indexOf('\n### ', startIndex + foundMarker.length);
+    }
+    
+    if (endIndex === -1) {
       endIndex = existingContent.length;
     }
 
