@@ -7,6 +7,7 @@ export const SPECS_DIR_NAME = 'specs';
 export const CHANGES_DIR_NAME = 'changes';
 export const ARCHIVES_DIR_NAME = 'archives';
 export const SKILLS_DIR_NAME = 'skills';
+export const KNOWLEDGE_DIR_NAME = 'knowledge';
 
 export const PROJECT_TYPES = [
   'wordpress-plugin',

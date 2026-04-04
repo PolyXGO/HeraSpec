@@ -8,6 +8,7 @@ yarn-error.log*
 _private_note/
 dist/
 bin/
+heraspec/
 *.tsbuildinfo
 
 # Runtime data

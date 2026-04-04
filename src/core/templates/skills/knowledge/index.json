@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "description": "HeRaSpec Knowledge Base — Pre-analyzed profiles for frameworks, APIs, and platforms",
+  "categories": ["frameworks", "apis", "platforms"],
+  "entries": [
+    {
+      "id": "php-laravel-botble",
+      "category": "frameworks",
+      "runtime": "php",
+      "framework": "laravel",
+      "cms": "botble",
+      "frameworkVersion": "^13.0",
+      "runtimeVersion": "^8.3",
+      "matchSignals": [
+        { "type": "file-contains", "file": "composer.json", "contains": "botble" },
+        { "type": "file-contains", "file": "composer.json", "contains": "laravel/framework" },
+        { "type": "directory-exists", "path": "platform/core" },
+        { "type": "directory-exists", "path": "platform/plugins" }
+      ],
+      "minMatchScore": 3,
+      "knowledgePath": "frameworks/php/laravel/botble",
+      "files": ["profile.json", "structure.md"],
+      "lastUpdated": "2026-04-04"
+    }
+  ]
+}

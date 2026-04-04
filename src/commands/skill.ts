@@ -404,6 +404,14 @@ export class SkillCommand {
 
       await FileSystemUtils.copyFile(templateFile, path.join(destPath, 'skill.md'));
 
+      // Copy Vietnamese translation file if specified
+      if (templateInfo.viFileName) {
+        const viFile = path.join(coreTemplatesDir, templateInfo.viFileName);
+        if (await FileSystemUtils.fileExists(viFile)) {
+          await FileSystemUtils.copyFile(viFile, path.join(destPath, 'skill.vi.md'));
+        }
+      }
+
       // Copy resource directories if specified
       if (templateInfo.resourceDirs) {
         for (const resourceDir of templateInfo.resourceDirs) {

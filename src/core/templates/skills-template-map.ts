@@ -7,6 +7,7 @@ export interface SkillTemplateInfo {
   isCrossCutting: boolean;
   projectType?: string;
   resourceDirs?: string[]; // Additional directories to copy (e.g., scripts, templates, data)
+  viFileName?: string; // Vietnamese translation file (e.g., skill.vi.md)
 }
 
 /**
@@ -44,6 +45,11 @@ export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
   'suggestion': {
     templateFileName: 'suggestion-skill.md',
     isCrossCutting: true,
+  },
+  'sourcecode-analyzer': {
+    templateFileName: 'sourcecode-analyzer-skill.md',
+    isCrossCutting: true,
+    viFileName: 'sourcecode-analyzer-skill.vi.md',
   },
   
   // Perfex module skills

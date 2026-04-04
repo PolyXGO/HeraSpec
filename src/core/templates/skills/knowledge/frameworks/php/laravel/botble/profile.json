@@ -1,0 +1,39 @@
+{
+  "id": "php-laravel-botble",
+  "name": "Botble CMS",
+  "runtime": "php",
+  "runtimeVersion": "^8.3|^8.4",
+  "framework": "laravel",
+  "frameworkVersion": "^13.0",
+  "cms": "botble",
+  "cmsType": "modular-monolith",
+  "description": "Laravel-based modular CMS with plugin/theme architecture and WordPress-style hooks",
+  "keyFeatures": [
+    "Plugin/Theme architecture via platform/ directory",
+    "WordPress-style hook system (add_filter/add_action/apply_filters/do_action)",
+    "Sanctum API authentication",
+    "Multi-cloud media storage drivers (s3/r2/wasabi/bunnycdn/do_spaces/backblaze)",
+    "Data synchronize import/export tooling",
+    "Composer merge plugin for plugin/theme dependencies",
+    "Module-based repository pattern with DI",
+    "Admin extension via AdminHelper::registerRoutes"
+  ],
+  "directorySignature": [
+    "platform/core",
+    "platform/packages",
+    "platform/plugins",
+    "platform/themes"
+  ],
+  "composerSignature": [
+    "botble",
+    "wikimedia/composer-merge-plugin"
+  ],
+  "typicalPlugins": [
+    "analytics", "audit-log", "backup", "block", "blog",
+    "captcha", "contact", "cookie-consent", "custom-field",
+    "gallery", "language", "language-advanced", "member",
+    "request-log", "social-login", "translation"
+  ],
+  "analysisFile": "structure.md",
+  "lastUpdated": "2026-04-04"
+}

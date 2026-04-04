@@ -13,8 +13,16 @@ import {
   CHANGES_DIR_NAME,
   ARCHIVES_DIR_NAME,
   SKILLS_DIR_NAME,
+  KNOWLEDGE_DIR_NAME,
   HERASPEC_MARKERS,
 } from './config.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export class InitCommand {
   async execute(targetPath: string = '.'): Promise<void> {
@@ -38,6 +46,7 @@ export class InitCommand {
       await FileSystemUtils.createDirectory(path.join(heraspecPath, CHANGES_DIR_NAME));
       await FileSystemUtils.createDirectory(path.join(heraspecPath, ARCHIVES_DIR_NAME));
       await FileSystemUtils.createDirectory(path.join(heraspecPath, SKILLS_DIR_NAME));
+      await FileSystemUtils.createDirectory(path.join(heraspecPath, KNOWLEDGE_DIR_NAME));
 
       // Create skills README
       const skillsReadmePath = path.join(heraspecPath, SKILLS_DIR_NAME, 'README.md');
@@ -52,6 +61,9 @@ export class InitCommand {
         const uiuxGuide = await this.getUIUXQuickReference();
         await FileSystemUtils.writeFile(uiuxGuidePath, uiuxGuide);
       }
+
+      // Deploy/update knowledge base (built-in only, preserves custom/)
+      await this.deployKnowledge(heraspecPath);
 
       // Create template files
       await this.createTemplateFiles(heraspecPath, alreadyInitialized);
@@ -257,6 +269,105 @@ export class InitCommand {
 
   private async getSkillsSection(): Promise<string> {
     return TemplateManager.getSkillsSection();
+  }
+
+  /**
+   * Get the knowledge source directory from CLI package
+   */
+  private async getKnowledgeSourceDir(): Promise<string | null> {
+    const possiblePaths: string[] = [];
+
+    // Strategy 1: Resolve from package.json location
+    try {
+      const packageJsonPath = require.resolve('../package.json');
+      const packageDir = path.dirname(packageJsonPath);
+
+      possiblePaths.push(
+        join(packageDir, 'src', 'core', 'templates', 'skills', 'knowledge'),
+        join(packageDir, 'dist', 'core', 'templates', 'skills', 'knowledge'),
+      );
+    } catch {
+      // Could not resolve, continue
+    }
+
+    // Strategy 2: npm installed package
+    try {
+      const packageJsonPath = require.resolve('heraspec/package.json');
+      const packageDir = path.dirname(packageJsonPath);
+
+      possiblePaths.push(
+        join(packageDir, 'dist', 'core', 'templates', 'skills', 'knowledge'),
+        join(packageDir, 'src', 'core', 'templates', 'skills', 'knowledge'),
+      );
+    } catch {
+      // Package not found, continue
+    }
+
+    // Strategy 3: Relative paths from current file
+    possiblePaths.push(
+      join(__dirname, '..', '..', 'src', 'core', 'templates', 'skills', 'knowledge'),
+      join(__dirname, '..', 'core', 'templates', 'skills', 'knowledge'),
+      join(process.cwd(), 'src', 'core', 'templates', 'skills', 'knowledge'),
+    );
+
+    for (const possiblePath of possiblePaths) {
+      if (await FileSystemUtils.fileExists(possiblePath)) {
+        return possiblePath;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Deploy/update built-in knowledge base, preserving custom/ directory
+   */
+  private async deployKnowledge(heraspecPath: string): Promise<void> {
+    const knowledgeDir = path.join(heraspecPath, KNOWLEDGE_DIR_NAME);
+    const sourceDir = await this.getKnowledgeSourceDir();
+
+    if (!sourceDir) {
+      // No knowledge source available — skip silently
+      return;
+    }
+
+    // Copy built-in files: index.json, README.md
+    const builtinFiles = ['index.json', 'README.md'];
+    for (const file of builtinFiles) {
+      const srcFile = path.join(sourceDir, file);
+      if (await FileSystemUtils.fileExists(srcFile)) {
+        await FileSystemUtils.copyFile(srcFile, path.join(knowledgeDir, file));
+      }
+    }
+
+    // Copy built-in category directories (frameworks, apis, platforms)
+    // SKIP 'custom' — never touch user's custom knowledge
+    const builtinCategories = ['frameworks', 'apis', 'platforms'];
+    for (const category of builtinCategories) {
+      const srcCategory = path.join(sourceDir, category);
+      if (await FileSystemUtils.fileExists(srcCategory)) {
+        const destCategory = path.join(knowledgeDir, category);
+        // Remove old built-in category and replace with latest
+        if (await FileSystemUtils.fileExists(destCategory)) {
+          await FileSystemUtils.removeDirectory(destCategory, true);
+        }
+        await FileSystemUtils.copyDirectory(srcCategory, destCategory);
+      }
+    }
+
+    // Create custom/ scaffold if it doesn't exist
+    const customDir = path.join(knowledgeDir, 'custom');
+    if (!(await FileSystemUtils.fileExists(customDir))) {
+      await FileSystemUtils.createDirectory(customDir);
+      await FileSystemUtils.writeFile(
+        path.join(customDir, 'index.json'),
+        JSON.stringify({
+          version: '1.0',
+          description: 'Custom knowledge entries — managed by user, never overwritten by CLI',
+          entries: [],
+        }, null, 2)
+      );
+    }
   }
 
   private async getSkillsReadmeTemplate(): Promise<string> {
