@@ -1,0 +1,22 @@
+/**
+ * Admin Styles for {{plugin_name}}
+ * 
+ * DESIGN SYSTEM:
+ * Use the ui-ux skill to define colors, fonts, and spacing.
+ * This file should contain layout and component-specific styles.
+ */
+
+.{{plugin_slug}}-dashboard .welcome-panel {
+    margin-top: 20px;
+    border: 1px solid #ccd0d4;
+    background: #fff;
+    padding: 20px;
+}
+
+.{{plugin_slug}}-dashboard .welcome-panel h2 {
+    margin-top: 0;
+}
+
+.{{plugin_slug}}-settings .form-table {
+    margin-top: 20px;
+}
