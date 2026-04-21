@@ -449,10 +449,11 @@ memoryCmd
 memoryCmd
   .command('analytics')
   .description('Show token usage and economic savings metrics')
-  .action(async () => {
+  .option('-H, --history', 'Show 13 most recent database size history logs')
+  .action(async (options: any) => {
     try {
       const memoryCommand = new MemoryCommand();
-      await memoryCommand.analytics('.');
+      await memoryCommand.analytics({ history: options.history }, '.');
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);

@@ -161,6 +161,14 @@ export interface MemoryStatus {
 
 // ============ Analytics Types ============
 
+export interface DbHistoryRecord {
+  id: number;
+  project: string;
+  dbSizeBytes: number;
+  createdAt: string;
+  createdAtEpoch: number;
+}
+
 export interface ProjectAnalytics {
   project: string;
   totalOps: number;
@@ -168,6 +176,8 @@ export interface ProjectAnalytics {
   tokensWithoutMemory: number;
   savingsTokens: number;
   savingsPercent: number;
+  dbSizeBytes: number;
+  history?: DbHistoryRecord[];
 }
 
 // ============ Utility Constants ============

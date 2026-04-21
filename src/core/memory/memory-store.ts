@@ -22,6 +22,7 @@ const DB_FILENAME = 'heraspec-memory.db';
 export class MemoryStore {
   private db: any;
   private dbPath: string;
+  private hasChanges = false;
 
   constructor(projectPath: string = '.') {
     this.dbPath = path.join(projectPath, HERASPEC_DIR_NAME, MEMORY_DIR_NAME, DB_FILENAME);
@@ -64,8 +65,35 @@ export class MemoryStore {
    */
   close(): void {
     if (this.db) {
+      if (this.hasChanges) {
+        this.logDbSizeChange();
+        this.hasChanges = false;
+      }
       this.db.close();
       this.db = null;
+    }
+  }
+
+  private logDbSizeChange(): void {
+    try {
+      const project = this.detectProjectName();
+      const fs = require('fs');
+      if (fs.existsSync(this.dbPath)) {
+        // Also account for WAL file if it exists, since it contains unflushed data
+        let totalSize = fs.statSync(this.dbPath).size;
+        const walPath = this.dbPath + '-wal';
+        if (fs.existsSync(walPath)) {
+          totalSize += fs.statSync(walPath).size;
+        }
+
+        const now = new Date();
+        this.db.prepare(`
+          INSERT INTO db_history (project, db_size_bytes, created_at, created_at_epoch)
+          VALUES (?, ?, ?, ?)
+        `).run(project, totalSize, now.toISOString(), now.getTime());
+      }
+    } catch (e) {
+      // fail silently
     }
   }
 
@@ -113,6 +141,8 @@ export class MemoryStore {
       now.toISOString(),
       now.getTime()
     );
+
+    this.hasChanges = true;
 
     return this.getObservationById(result.lastInsertRowid as number)!;
   }
@@ -179,6 +209,7 @@ export class MemoryStore {
     }
 
     const result = this.db.prepare(sql).run(...params);
+    if (result.changes > 0) this.hasChanges = true;
     return result.changes;
   }
 
@@ -212,6 +243,8 @@ export class MemoryStore {
       now.toISOString(),
       now.getTime()
     );
+
+    this.hasChanges = true;
 
     return this.getSummaryById(result.lastInsertRowid as number)!;
   }
@@ -413,18 +446,52 @@ export class MemoryStore {
       let savingsTokens = tokensWithoutMemory - tokensWithMemory;
       let savingsPercent = tokensWithoutMemory > 0 ? (savingsTokens / tokensWithoutMemory) * 100 : 0;
 
+      let dbSizeBytes = 0;
+      try {
+        const fs = require('fs');
+        if (fs.existsSync(this.dbPath)) {
+          dbSizeBytes = fs.statSync(this.dbPath).size;
+          const walPath = this.dbPath + '-wal';
+          if (fs.existsSync(walPath)) {
+            dbSizeBytes += fs.statSync(walPath).size;
+          }
+        }
+      } catch { /* ignore */ }
+
       results.push({
         project,
         totalOps: data.ops,
         tokensWithMemory,
         tokensWithoutMemory,
         savingsTokens,
-        savingsPercent
+        savingsPercent,
+        dbSizeBytes
       });
     }
 
     // Sort by savings highest to lowest
     return results.sort((a, b) => b.savingsTokens - a.savingsTokens);
+  }
+
+  /**
+   * Get database size history updates
+   */
+  getDbHistory(project: string, limit: number = 13): DbHistoryRecord[] {
+    this.ensureOpen();
+    const rows = this.db.prepare(`
+      SELECT * FROM db_history 
+      WHERE project = ? 
+      ORDER BY created_at_epoch DESC 
+      LIMIT ?
+    `).all(project, limit);
+
+    return rows.map((row: any) => ({
+      id: row.id,
+      project: row.project,
+      dbSizeBytes: row.db_size_bytes,
+      createdAt: row.created_at,
+      createdAtEpoch: row.created_at_epoch
+    }));
   }
 
   // ============ Helpers ============

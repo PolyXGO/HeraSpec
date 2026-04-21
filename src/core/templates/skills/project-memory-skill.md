@@ -89,13 +89,15 @@ heraspec memory timeline  # Chronological view of activity
 View detailed token usage vs savings comparison per project:
 
 ```bash
-heraspec memory analytics  # Table + chart of token economics
+heraspec memory analytics            # Table + chart of token economics
+heraspec memory analytics --history  # Includes 13 latest database size changes
 ```
 
 Output includes:
-- **Table**: Project name, Operations count, Tokens With Memory, Tokens Without Memory, Savings %
+- **Table**: Project name, Operations count, Tokens With Memory, Tokens Without Memory, Savings %, **DB Size**
 - **Bar Chart**: Visual comparison of tokens avoided per project
 - **Totals**: Aggregated savings across all projects
+- **History (Optional)**: A chronological delta chart of how the `.db` file size has changed over time.
 
 ### 7. Maintenance
 ```bash

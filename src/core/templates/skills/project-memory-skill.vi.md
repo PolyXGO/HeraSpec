@@ -89,13 +89,15 @@ heraspec memory timeline  # Xem hoạt động theo thứ tự thời gian
 Xem bảng so sánh chi tiết token đã dùng và tiết kiệm theo từng dự án:
 
 ```bash
-heraspec memory analytics  # Bảng + biểu đồ về hiệu quả token
+heraspec memory analytics            # Bảng + biểu đồ về hiệu quả token
+heraspec memory analytics --history  # Đính kèm thêm 13 mốc thời gian file DB thay đổi kích thước
 ```
 
 Kết quả bao gồm:
-- **Bảng (Table)**: Tên dự án, Số thao tác, Token khi dùng Memory, Token khi không dùng Memory, % Tiết kiệm
+- **Bảng (Table)**: Tên dự án, Số thao tác, Token khi dùng Memory, Token khi không dùng Memory, % Tiết kiệm, **Kích thước DB**
 - **Biểu đồ thanh (Bar Chart)**: So sánh trực quan số token đã tránh được cho mỗi dự án
 - **Tổng cộng (Totals)**: Tổng hợp tiết kiệm trên tất cả dự án
+- **Lịch sử (History - Tùy chọn)**: Bảng thời gian (Chronological delta chart) cho thấy file `.db` đã thay đổi kích thước ra sao qua các lần cập nhật.
 
 ### 7. Bảo trì (Maintenance)
 ```bash

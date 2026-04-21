@@ -558,7 +558,7 @@ export class MemoryCommand {
   /**
    * heraspec memory analytics - Show token usage and economic savings metrics
    */
-  async analytics(projectPath: string = '.'): Promise<void> {
+  async analytics(options: { history?: boolean } = {}, projectPath: string = '.'): Promise<void> {
     try {
       const store = new MemoryStore(projectPath);
       store.open();
@@ -575,15 +575,16 @@ export class MemoryCommand {
         console.log(chalk.gray('Comparing estimated token usage: With Memory vs Without Memory.\n'));
 
         // Output table
-        console.log('═'.repeat(90));
+        console.log('═'.repeat(105));
         console.log(
           chalk.bold('Project'.padEnd(25)) + 
           chalk.bold('Ops'.padEnd(6)) + 
           chalk.bold('Tokens (With Memory)'.padEnd(22)) + 
           chalk.bold('Tokens (Without)'.padEnd(20)) +
-          chalk.bold('Savings'.padEnd(10))
+          chalk.bold('Savings'.padEnd(10)) +
+          chalk.bold('DB Size'.padEnd(12))
         );
-        console.log('─'.repeat(90));
+        console.log('─'.repeat(105));
 
         let overallWith = 0;
         let overallWithout = 0;
@@ -599,19 +600,20 @@ export class MemoryCommand {
            const withMem = '~' + this.formatNumber(s.tokensWithMemory);
            const withoutMem = '~' + this.formatNumber(s.tokensWithoutMemory);
            const savings = chalk.green('+' + s.savingsPercent.toFixed(0) + '%');
+           const dbSize = this.formatBytes(s.dbSizeBytes || 0);
 
-           console.log(`${pName}${ops}${withMem.padEnd(22)}${withoutMem.padEnd(20)}${savings}`);
+           console.log(`${pName}${ops}${withMem.padEnd(22)}${withoutMem.padEnd(20)}${savings.padEnd(10)}${dbSize}`);
         }
         
-        console.log('─'.repeat(90));
+        console.log('─'.repeat(105));
         const totalSavingsPct = overallWithout > 0 ? ((overallWithout - overallWith) / overallWithout) * 100 : 0;
         console.log(
           chalk.bold('TOTAL'.padEnd(31)) + 
           chalk.bold(`~${this.formatNumber(overallWith)}`.padEnd(22)) + 
           chalk.bold(`~${this.formatNumber(overallWithout)}`.padEnd(20)) +
-          chalk.bold(chalk.green(`+${totalSavingsPct.toFixed(0)}%`))
+          chalk.bold(chalk.green(`+${totalSavingsPct.toFixed(0)}%`.padEnd(10)))
         );
-        console.log('═'.repeat(90) + '\n');
+        console.log('═'.repeat(105) + '\n');
         
         // Draw ASCII Chart for top 3
         console.log(chalk.cyan('📈 Top Savings Chart (Tokens Avoided)\n'));
@@ -629,6 +631,40 @@ export class MemoryCommand {
         }
 
         console.log('\n' + chalk.gray('💡 Note: "Tokens Without" assume reading 50k tokens (average codebase context) per operation if memory was absent.') + '\n');
+
+        // History Table if requested
+        if (options.history) {
+          for (const s of stats) {
+            const historyRows = store.getDbHistory(s.project, 13);
+            if (historyRows.length === 0) continue;
+
+            console.log(chalk.cyan(`\n🕒 Database Size History: [${s.project}] (Latest 13)`));
+            console.log('═'.repeat(60));
+            console.log(
+              chalk.bold('Date'.padEnd(25)) + 
+              chalk.bold('Size'.padEnd(15)) +
+              chalk.bold('Delta')
+            );
+            console.log('─'.repeat(60));
+
+            for (let i = 0; i < historyRows.length; i++) {
+              const row = historyRows[i];
+              let deltaStr = '-';
+              if (i < historyRows.length - 1) {
+                const prev = historyRows[i + 1];
+                const diff = row.dbSizeBytes - prev.dbSizeBytes;
+                if (diff > 0) {
+                     deltaStr = chalk.green(`+${this.formatBytes(diff)}`);
+                } else if (diff < 0) {
+                     deltaStr = chalk.yellow(`-${this.formatBytes(Math.abs(diff))}`);
+                }
+              }
+              const dStr = new Date(row.createdAtEpoch).toLocaleString();
+              console.log(`${dStr.padEnd(25)}${this.formatBytes(row.dbSizeBytes).padEnd(15)}${deltaStr}`);
+            }
+            console.log('═'.repeat(60) + '\n');
+          }
+        }
 
       } finally {
         store.close();

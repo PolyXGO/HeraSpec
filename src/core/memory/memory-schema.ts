@@ -3,7 +3,7 @@
  * SQLite schema definitions, FTS5 indexes, and migration system
  */
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /**
  * Core table definitions
@@ -52,6 +52,15 @@ export const CREATE_TABLES = `
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     created_at_epoch INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000)
   );
+
+  -- Database size history tracking
+  CREATE TABLE IF NOT EXISTS db_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project TEXT NOT NULL,
+    db_size_bytes INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    created_at_epoch INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000)
+  );
 `;
 
 /**
@@ -66,6 +75,7 @@ export const CREATE_INDEXES = `
   CREATE INDEX IF NOT EXISTS idx_sum_created ON session_summaries(created_at_epoch DESC);
   CREATE INDEX IF NOT EXISTS idx_sessions_project ON sessions(project);
   CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
+  CREATE INDEX IF NOT EXISTS idx_history_project ON db_history(project);
 `;
 
 /**
@@ -177,7 +187,18 @@ export function runMigrations(db: any): void {
   }
 
   // Future migrations go here:
-  // if (currentVersion < 2) { migrateTo2(db); }
+  if (currentVersion < 2) {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS db_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project TEXT NOT NULL,
+        db_size_bytes INTEGER NOT NULL,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        created_at_epoch INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000)
+      );
+      CREATE INDEX IF NOT EXISTS idx_history_project ON db_history(project);
+    `);
+  }
   // if (currentVersion < 3) { migrateTo3(db); }
 
   db.pragma(`user_version = ${SCHEMA_VERSION}`);
