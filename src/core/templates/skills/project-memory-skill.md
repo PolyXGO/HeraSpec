@@ -85,7 +85,19 @@ heraspec memory status    # Observation count, top concepts, top files
 heraspec memory timeline  # Chronological view of activity
 ```
 
-### 6. Maintenance
+### 6. Token Analytics Report
+View detailed token usage vs savings comparison per project:
+
+```bash
+heraspec memory analytics  # Table + chart of token economics
+```
+
+Output includes:
+- **Table**: Project name, Operations count, Tokens With Memory, Tokens Without Memory, Savings %
+- **Bar Chart**: Visual comparison of tokens avoided per project
+- **Totals**: Aggregated savings across all projects
+
+### 7. Maintenance
 ```bash
 heraspec memory prune 90  # Delete observations older than 90 days
 ```
@@ -138,6 +150,11 @@ Memory configuration is stored in `heraspec/memory/config.json`:
 | Log observation | ~200-500 | Investment for future sessions |
 | Smart explore (outline) | ~1,000-2,000 | vs ~12,000+ full file read |
 
+To view a live analytics dashboard of token savings, run:
+```bash
+heraspec memory analytics
+```
+
 ## Bootstrapping Existing Projects
 
 If you are adding the `project-memory` skill to an older project that already has historical specs and changes (in `heraspec/specs/` and `heraspec/archives/`), you can bootstrap the memory system without writing any code.
@@ -158,6 +175,41 @@ heraspec memory log \
   --files-modified "[Extract affected files]"
 
 Repeat this until all old specs are migrated into the memory system.
+```
+
+Alternatively, use the built-in **CLI command** (faster, no AI tokens spent):
+```bash
+heraspec memory bootstrap        # Interactive — prompts for confirmation
+heraspec memory bootstrap --yes  # Non-interactive — auto-confirm
+```
+
+This command will automatically scan `heraspec/specs/`, `heraspec/archives/`, and `heraspec/changes/`, extract title/narrative/files from each markdown spec, and insert them into the memory database.
+
+> **Note:** Duplicate titles are automatically skipped, so running the command multiple times is safe.
+
+## Agent-Triggered Reporting
+
+When the user asks the AI agent to view memory reports, analytics, or token savings — the agent should run the CLI command and return the output:
+
+```text
+User: "Show me the memory analytics report"
+User: "How many tokens has the memory system saved?"
+User: "Give me a token usage report"
+```
+
+**Agent action:** Execute the following command and display the output to the user:
+```bash
+heraspec memory analytics
+```
+
+For a quick status check:
+```bash
+heraspec memory status
+```
+
+For a timeline view:
+```bash
+heraspec memory timeline
 ```
 
 ## Limitations

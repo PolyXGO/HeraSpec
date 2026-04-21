@@ -85,7 +85,19 @@ heraspec memory status    # Số lượng observation, top concepts, top files
 heraspec memory timeline  # Xem hoạt động theo thứ tự thời gian
 ```
 
-### 6. Bảo trì (Maintenance)
+### 6. Báo cáo Phân tích Token (Token Analytics Report)
+Xem bảng so sánh chi tiết token đã dùng và tiết kiệm theo từng dự án:
+
+```bash
+heraspec memory analytics  # Bảng + biểu đồ về hiệu quả token
+```
+
+Kết quả bao gồm:
+- **Bảng (Table)**: Tên dự án, Số thao tác, Token khi dùng Memory, Token khi không dùng Memory, % Tiết kiệm
+- **Biểu đồ thanh (Bar Chart)**: So sánh trực quan số token đã tránh được cho mỗi dự án
+- **Tổng cộng (Totals)**: Tổng hợp tiết kiệm trên tất cả dự án
+
+### 7. Bảo trì (Maintenance)
 ```bash
 heraspec memory prune 90  # Xóa các observation cũ hơn 90 ngày
 ```
@@ -138,6 +150,11 @@ Cấu hình bộ nhớ được lưu trữ tại `heraspec/memory/config.json`:
 | Ghi lại observation | ~200-500 | Đầu tư dài hạn cho các phiên sau |
 | Smart explore (outline) | ~1,000-2,000 | so với ~12,000+ nếu đọc toàn bộ file |
 
+Để xem bảng phân tích trực tiếp về số token đã tiết kiệm, chạy:
+```bash
+heraspec memory analytics
+```
+
 ## Tích hợp dữ liệu cũ (Bootstrapping Existing Projects)
 
 Nếu bạn vừa thêm skill `project-memory` vào một **dự án cũ** đã và đang làm việc theo quy trình HeraSpec (đã có thư mục `heraspec/specs/` và `heraspec/archives/`), bạn có thể "tích hợp" dữ liệu về bộ nhớ rất dễ dàng mà không cần lập trình thêm.
@@ -158,6 +175,42 @@ heraspec memory log \
   --files-modified "[Trích xuất hoặc suy thoái các file bị ảnh hưởng]"
 
 Lặp lại việc này cho đến khi di chuyển (migrate) hoàn tất tất cả spec cũ vào hệ thống memory.
+```
+
+Ngoài ra, có thể sử dụng **lệnh CLI có sẵn** (nhanh hơn, không tốn AI token):
+```bash
+heraspec memory bootstrap        # Tương tác — hỏi xác nhận trước khi chạy
+heraspec memory bootstrap --yes  # Không tương tác — tự động xác nhận
+```
+
+Lệnh này sẽ tự động quét `heraspec/specs/`, `heraspec/archives/` và `heraspec/changes/`, trích xuất tiêu đề/nội dung/file từ mỗi markdown spec, rồi chèn vào cơ sở dữ liệu memory.
+
+> **Lưu ý:** Các tiêu đề trùng lặp sẽ tự động bị bỏ qua, nên chạy lệnh nhiều lần vẫn an toàn.
+
+## Báo cáo do Agent kích hoạt (Agent-Triggered Reporting)
+
+Khi user yêu cầu AI agent xem báo cáo bộ nhớ, phân tích token hoặc thống kê tiết kiệm — agent nên chạy lệnh CLI và hiển thị kết quả cho user:
+
+```text
+User: "Cho tôi xem báo cáo phân tích memory"
+User: "Hệ thống memory đã tiết kiệm bao nhiêu token?"
+User: "Xem báo cáo token usage"
+User: "Show me the memory analytics report"
+```
+
+**Hành động của Agent:** Chạy lệnh sau và hiển thị kết quả cho user:
+```bash
+heraspec memory analytics
+```
+
+Để xem trạng thái nhanh:
+```bash
+heraspec memory status
+```
+
+Để xem dòng thời gian:
+```bash
+heraspec memory timeline
 ```
 
 ## Hạn chế (Limitations)
