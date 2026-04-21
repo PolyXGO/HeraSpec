@@ -11,6 +11,9 @@ import { OBSERVATION_TYPES, OBSERVATION_TYPE_ICONS, estimateTokens } from '../co
 import type { ObservationType } from '../core/memory/memory-types.js';
 import { analyzeAndRecommend, buildOptimizedConfig } from '../core/memory/config-advisor.js';
 import { saveContextConfig } from '../core/memory/context-config.js';
+import { FileSystemUtils } from '../utils/file-system.js';
+import path from 'path';
+import { SPECS_DIR_NAME, CHANGES_DIR_NAME, ARCHIVES_DIR_NAME, HERASPEC_DIR_NAME } from '../core/config.js';
 
 export class MemoryCommand {
   /**
@@ -417,6 +420,138 @@ export class MemoryCommand {
     } catch (error) {
       console.error(chalk.red(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
       process.exitCode = 1;
+    }
+  }
+
+  /**
+   * heraspec memory bootstrap - Import historical specs and archives into memory
+   */
+  async bootstrap(options: { yes?: boolean } = {}, projectPath: string = '.'): Promise<void> {
+    console.log(chalk.cyan('\n🚀 Bootstrapping Project Memory from Historical Specs...\n'));
+
+    const heraspecPath = path.join(projectPath, HERASPEC_DIR_NAME);
+    const specsDir = path.join(heraspecPath, SPECS_DIR_NAME);
+    const archivesDir = path.join(heraspecPath, ARCHIVES_DIR_NAME);
+    const changesDir = path.join(heraspecPath, CHANGES_DIR_NAME);
+
+    // Collect all md files
+    const mdFiles: string[] = [];
+
+    const scanDir = async (dirPath: string) => {
+      if (!(await FileSystemUtils.fileExists(dirPath))) return;
+      const entries = await FileSystemUtils.readDirectory(dirPath);
+      for (const entry of entries) {
+        const fullPath = path.join(dirPath, entry);
+        const stat = await FileSystemUtils.stat(fullPath);
+        if (stat.isDirectory()) {
+          // Inside a change/archive folder, look for specific md files like the spec itself
+          const subEntries = await FileSystemUtils.readDirectory(fullPath);
+          for (const sub of subEntries) {
+            if (sub.endsWith('.md') && sub !== 'tasks.md' && sub !== 'project.md') {
+              mdFiles.push(path.join(fullPath, sub));
+            }
+          }
+        } else if (entry.endsWith('.md')) {
+          mdFiles.push(fullPath);
+        }
+      }
+    };
+
+    await scanDir(specsDir);
+    await scanDir(archivesDir);
+    // changesDir usually has the same structure as archives
+    await scanDir(changesDir);
+
+    if (mdFiles.length === 0) {
+      console.log(chalk.yellow('No historical specs found.'));
+      return;
+    }
+
+    if (!options.yes) {
+      const { confirm } = await import('@inquirer/prompts');
+      const answer = await confirm({
+        message: `Found ${mdFiles.length} potential spec files. Proceed to extract and inject into memory?`,
+        default: true,
+      });
+      if (!answer) {
+        console.log(chalk.gray('Aborted.'));
+        return;
+      }
+    }
+
+    const spinner = ora('Parsing and migrating specs...').start();
+    const store = new MemoryStore(projectPath);
+    let parsedCount = 0;
+    let skippedCount = 0;
+
+    try {
+      store.open();
+      // To deduplicate we keep track of titles imported in this run or check DB
+      const existingTitles = new Set(
+        store.getRecentObservations(undefined, 1000).map(o => o.title.toLowerCase())
+      );
+
+      for (const filePath of mdFiles) {
+        const content = await FileSystemUtils.readFile(filePath);
+        const fileName = path.basename(filePath, '.md');
+
+        // Extract Title: First H1 or fallback to filename
+        const titleMatch = content.match(/^#\s+(.+)$/m);
+        const title = titleMatch ? titleMatch[1].trim() : fileName.replace(/-/g, ' ');
+
+        if (existingTitles.has(title.toLowerCase())) {
+          skippedCount++;
+          continue;
+        }
+
+        // Extract Narrative: Text between ## Goal / ## Context and next ##
+        let narrative = '';
+        const narrativeMatch = content.match(/##\s+(?:Goal|Context)\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+        if (narrativeMatch) {
+          narrative = narrativeMatch[1].trim();
+        } else {
+          // Fallback, use the first paragraph
+          const firstParagraph = content.replace(/^#.*\n/, '').trim().split('\n\n')[0];
+          narrative = firstParagraph || 'Bootstrapped historical spec.';
+        }
+        
+        if (narrative.length > 500) narrative = narrative.substring(0, 500) + '...';
+
+        // Extract Modified Files: paths matching #### [MODIFY] or [NEW] etc
+        const filesModified: string[] = [];
+        const fileRegex = /####\s+\[(?:MODIFY|NEW|DELETE)\]\s+(?:\[(.*?)\]|\S+)\s*\((.*?)\)/gi;
+        let fmMatch;
+        while ((fmMatch = fileRegex.exec(content)) !== null) {
+          const fsPath = fmMatch[2]; // url/path part
+          // Strip file:/// prefix
+          const cleanPath = fsPath.replace(/^file:\/\/\/?/, '');
+          filesModified.push(cleanPath);
+        }
+        
+        // Add minimal concept tags
+        const concepts = ['legacy', 'bootstrapped'];
+        if (filesModified.length > 0) concepts.push('files-modified');
+
+        store.addObservation({
+          type: 'feature',
+          title: title,
+          narrative: narrative,
+          concepts: concepts,
+          filesModified: filesModified.slice(0, 5), // Keep top 5 to not bloat limit
+        });
+        
+        existingTitles.add(title.toLowerCase());
+        parsedCount++;
+      }
+
+      spinner.succeed(`Migration complete: ${parsedCount} specs imported, ${skippedCount} skipped (already exist).`);
+      console.log(chalk.gray(`\nYou can verify by running: ${chalk.cyan('heraspec memory status')}`));
+
+    } catch (error) {
+      spinner.fail(`Metadata extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      process.exitCode = 1;
+    } finally {
+      store.close();
     }
   }
 }

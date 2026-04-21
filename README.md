@@ -45,6 +45,14 @@ HeraSpec is a specification-based development framework that helps you:
 <!-- HeraSpec Section -->
 
 <!-- HeraSpec Section -->
+
+<!-- HeraSpec Section -->
+
+<!-- HeraSpec Section -->
+
+<!-- HeraSpec Section -->
+
+<!-- HeraSpec Section -->
 ## HeraSpec Development
 
 This project uses [HeraSpec](https://github.com/your-org/heraspec) for spec-driven development.

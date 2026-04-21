@@ -138,6 +138,28 @@ Memory configuration is stored in `heraspec/memory/config.json`:
 | Log observation | ~200-500 | Investment for future sessions |
 | Smart explore (outline) | ~1,000-2,000 | vs ~12,000+ full file read |
 
+## Bootstrapping Existing Projects
+
+If you are adding the `project-memory` skill to an older project that already has historical specs and changes (in `heraspec/specs/` and `heraspec/archives/`), you can bootstrap the memory system without writing any code.
+
+Simply provide this prompt to the AI agent **once**:
+
+```text
+Use the project-memory skill.
+Please bootstrap the project memory from all our existing specs and archives.
+Open the folders: heraspec/specs/ and heraspec/archives/
+For EVERY sub-folder/file inside, read it to understand the context, then run:
+
+heraspec memory log \
+  --type feature \
+  --title "[Extract spec/change title]" \
+  --narrative "[Short summary of what was implemented]" \
+  --concepts "[Extract key tags/technologies]" \
+  --files-modified "[Extract affected files]"
+
+Repeat this until all old specs are migrated into the memory system.
+```
+
 ## Limitations
 
 - Memory is project-local (stored in `heraspec/memory/`)

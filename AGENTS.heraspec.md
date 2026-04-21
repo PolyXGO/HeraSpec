@@ -206,6 +206,121 @@ Tasks grouped by project type and skill:
 - [ ] Task description
 ```
 
+
+## Spec Format
+
+Specs must include:
+- `## Meta` section with project type, domain, stack
+- `## Purpose`
+- `## Requirements` with scenarios
+
+## Delta Spec Format
+
+Delta specs use:
+- `## ADDED Requirements`
+- `## MODIFIED Requirements`
+- `## REMOVED Requirements`
+
+## Tasks Format
+
+Tasks grouped by project type and skill:
+```
+## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
+- [ ] Task description
+```
+
+
+## Spec Format
+
+Specs must include:
+- `## Meta` section with project type, domain, stack
+- `## Purpose`
+- `## Requirements` with scenarios
+
+## Delta Spec Format
+
+Delta specs use:
+- `## ADDED Requirements`
+- `## MODIFIED Requirements`
+- `## REMOVED Requirements`
+
+## Tasks Format
+
+Tasks grouped by project type and skill:
+```
+## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
+- [ ] Task description
+```
+
+
+## Spec Format
+
+Specs must include:
+- `## Meta` section with project type, domain, stack
+- `## Purpose`
+- `## Requirements` with scenarios
+
+## Delta Spec Format
+
+Delta specs use:
+- `## ADDED Requirements`
+- `## MODIFIED Requirements`
+- `## REMOVED Requirements`
+
+## Tasks Format
+
+Tasks grouped by project type and skill:
+```
+## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
+- [ ] Task description
+```
+
+
+## Spec Format
+
+Specs must include:
+- `## Meta` section with project type, domain, stack
+- `## Purpose`
+- `## Requirements` with scenarios
+
+## Delta Spec Format
+
+Delta specs use:
+- `## ADDED Requirements`
+- `## MODIFIED Requirements`
+- `## REMOVED Requirements`
+
+## Tasks Format
+
+Tasks grouped by project type and skill:
+```
+## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
+- [ ] Task description
+```
+
+
+## Spec Format
+
+Specs must include:
+- `## Meta` section with project type, domain, stack
+- `## Purpose`
+- `## Requirements` with scenarios
+
+## Delta Spec Format
+
+Delta specs use:
+- `## ADDED Requirements`
+- `## MODIFIED Requirements`
+- `## REMOVED Requirements`
+
+## Tasks Format
+
+Tasks grouped by project type and skill:
+```
+## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
+- [ ] Task description
+```
+
 ## Skills System
 
 **CRITICAL: Mandatory Prerequisite Check**
@@ -248,6 +363,86 @@ When generating documentation, do NOT simply fill a template. The Agent MUST:
 
 Example with multiple skills in one change:
 ```
+## 1. WordPress module – Feature (skill: admin-settings-page)
+- [ ] Task 1.1 Create module structure
+- [ ] Task 1.2 Configure registration
+
+## 2. UI/UX – Admin Interface (skill: ui-ux)
+- [ ] Task 2.1 Design color palette
+- [ ] Task 2.2 Create component styles
+
+## 3. Documents – User Guide (skill: documents)
+- [ ] Task 3.1 Write technical docs
+```
+
+**Key rule**: Switch skill.md when switching task groups!
+
+
+
+## 1. WordPress module – Feature (skill: admin-settings-page)
+- [ ] Task 1.1 Create module structure
+- [ ] Task 1.2 Configure registration
+
+## 2. UI/UX – Admin Interface (skill: ui-ux)
+- [ ] Task 2.1 Design color palette
+- [ ] Task 2.2 Create component styles
+
+## 3. Documents – User Guide (skill: documents)
+- [ ] Task 3.1 Write technical docs
+```
+
+**Key rule**: Switch skill.md when switching task groups!
+
+
+
+## 1. WordPress module – Feature (skill: admin-settings-page)
+- [ ] Task 1.1 Create module structure
+- [ ] Task 1.2 Configure registration
+
+## 2. UI/UX – Admin Interface (skill: ui-ux)
+- [ ] Task 2.1 Design color palette
+- [ ] Task 2.2 Create component styles
+
+## 3. Documents – User Guide (skill: documents)
+- [ ] Task 3.1 Write technical docs
+```
+
+**Key rule**: Switch skill.md when switching task groups!
+
+
+
+## 1. WordPress module – Feature (skill: admin-settings-page)
+- [ ] Task 1.1 Create module structure
+- [ ] Task 1.2 Configure registration
+
+## 2. UI/UX – Admin Interface (skill: ui-ux)
+- [ ] Task 2.1 Design color palette
+- [ ] Task 2.2 Create component styles
+
+## 3. Documents – User Guide (skill: documents)
+- [ ] Task 3.1 Write technical docs
+```
+
+**Key rule**: Switch skill.md when switching task groups!
+
+
+
+## 1. WordPress module – Feature (skill: admin-settings-page)
+- [ ] Task 1.1 Create module structure
+- [ ] Task 1.2 Configure registration
+
+## 2. UI/UX – Admin Interface (skill: ui-ux)
+- [ ] Task 2.1 Design color palette
+- [ ] Task 2.2 Create component styles
+
+## 3. Documents – User Guide (skill: documents)
+- [ ] Task 3.1 Write technical docs
+```
+
+**Key rule**: Switch skill.md when switching task groups!
+
+
+
 ## 1. WordPress module – Feature (skill: admin-settings-page)
 - [ ] Task 1.1 Create module structure
 - [ ] Task 1.2 Configure registration

@@ -16,6 +16,8 @@ import {
   KNOWLEDGE_DIR_NAME,
   HERASPEC_MARKERS,
 } from './config.js';
+import { getSkillTemplateInfo, getAllSkillTemplates } from './templates/skills-template-map.js';
+import { MemoryCommand } from '../commands/memory.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { createRequire } from 'module';
@@ -78,6 +80,14 @@ export class InitCommand {
 
       // Create or update root AGENTS.md (merge Skills section if exists)
       await this.updateAgentsFile(newAgentsPath, alreadyInitialized);
+
+      // Update installed built-in skills (only on re-init, skip custom project skills)
+      if (alreadyInitialized) {
+        await this.updateInstalledSkills(heraspecPath);
+      }
+
+      // For all projects (new or existing), ensure project-memory is installed and check for history
+      await this.checkAndBootstrapMemory(heraspecPath, resolvedPath, spinner);
 
       // Update related markdown files (README.md, etc.)
       await this.updateRelatedMarkdownFiles(resolvedPath);
@@ -450,6 +460,251 @@ export class InitCommand {
   private async getSkillsSection(): Promise<string> {
     return TemplateManager.getSkillsSection();
   }
+
+  /**
+   * Resolve core templates directory (same logic as skill.ts)
+   */
+  private async getCoreTemplatesDir(): Promise<string | null> {
+    const possiblePaths: string[] = [];
+
+    try {
+      const packageJsonPath = require.resolve('../package.json');
+      const packageDir = path.dirname(packageJsonPath);
+      possiblePaths.push(
+        join(packageDir, 'src', 'core', 'templates', 'skills'),
+        join(packageDir, 'dist', 'core', 'templates', 'skills'),
+      );
+    } catch { /* continue */ }
+
+    try {
+      const packageJsonPath = require.resolve('heraspec/package.json');
+      const packageDir = path.dirname(packageJsonPath);
+      possiblePaths.push(
+        join(packageDir, 'dist', 'core', 'templates', 'skills'),
+        join(packageDir, 'src', 'core', 'templates', 'skills'),
+      );
+    } catch { /* continue */ }
+
+    possiblePaths.push(
+      join(__dirname, '..', '..', 'src', 'core', 'templates', 'skills'),
+      join(__dirname, '..', 'core', 'templates', 'skills'),
+      join(process.cwd(), 'src', 'core', 'templates', 'skills'),
+    );
+
+    for (const p of possiblePaths) {
+      if (await FileSystemUtils.fileExists(p)) return p;
+    }
+    return null;
+  }
+
+  /**
+   * Update installed built-in skills on re-init.
+   *
+   * Rules:
+   * - Only update skills that exist in SKILL_TEMPLATE_MAP (built-in / known skills)
+   * - Skip skills NOT in the template map (custom skills added by the project)
+   * - For each matching skill: update skill.md + re-copy resourceDirs from template
+   *   but PRESERVE templates/, scripts/, examples/ sub-folders added by user
+   */
+  private async updateInstalledSkills(heraspecPath: string): Promise<void> {
+    const skillsDir = path.join(heraspecPath, SKILLS_DIR_NAME);
+    if (!(await FileSystemUtils.fileExists(skillsDir))) return;
+
+    const coreTemplatesDir = await this.getCoreTemplatesDir();
+    if (!coreTemplatesDir) return;
+
+    const allTemplates = getAllSkillTemplates();
+    let updatedCount = 0;
+    let skippedCount = 0;
+
+    // Build a set of known skill keys (skillName only, or "projectType/skillName")
+    // for fast lookup when walking the installed skills directory
+    const installedSkillPaths = await this.collectInstalledSkillPaths(skillsDir);
+
+    for (const { skillPath, skillName, projectType } of installedSkillPaths) {
+      // Check if this skill is a known built-in skill
+      const templateInfo = getSkillTemplateInfo(skillName, projectType);
+
+      if (!templateInfo) {
+        // Not a built-in skill — custom project skill, leave it alone
+        skippedCount++;
+        continue;
+      }
+
+      const templateFile = path.join(coreTemplatesDir, templateInfo.templateFileName);
+      if (!(await FileSystemUtils.fileExists(templateFile))) {
+        skippedCount++;
+        continue;
+      }
+
+      // Update skill.md with latest from template
+      await FileSystemUtils.copyFile(templateFile, path.join(skillPath, 'skill.md'));
+
+      // Update Vietnamese translation if it exists in template
+      if (templateInfo.viFileName) {
+        const viFile = path.join(coreTemplatesDir, templateInfo.viFileName);
+        if (await FileSystemUtils.fileExists(viFile)) {
+          await FileSystemUtils.copyFile(viFile, path.join(skillPath, 'skill.vi.md'));
+        }
+      }
+
+      // Re-copy resourceDirs from template (overwrite built-in resources)
+      // These are owned by the skill template, not by the user
+      if (templateInfo.resourceDirs) {
+        for (const resourceDir of templateInfo.resourceDirs) {
+          const srcResourceDir = path.join(coreTemplatesDir, resourceDir);
+          const destResourceDir = path.join(skillPath, resourceDir);
+
+          if (await FileSystemUtils.fileExists(srcResourceDir)) {
+            // Remove old and replace — these are template-owned directories
+            if (await FileSystemUtils.fileExists(destResourceDir)) {
+              await FileSystemUtils.removeDirectory(destResourceDir, true);
+            }
+            await FileSystemUtils.copyDirectory(srcResourceDir, destResourceDir);
+          }
+        }
+      }
+
+      // Ensure standard dirs exist (never removed, just ensured)
+      for (const dir of ['templates', 'scripts', 'examples']) {
+        await FileSystemUtils.createDirectory(path.join(skillPath, dir));
+      }
+
+      updatedCount++;
+    }
+
+    if (updatedCount > 0) {
+      console.log(chalk.gray(`  ✓ Updated ${updatedCount} built-in skill(s)${skippedCount > 0 ? `, skipped ${skippedCount} custom skill(s)` : ''}`));
+    }
+  }
+
+  /**
+   * Walk heraspec/skills/ and return all installed skill paths with metadata
+   */
+  private async collectInstalledSkillPaths(
+    skillsDir: string
+  ): Promise<Array<{ skillPath: string; skillName: string; projectType?: string }>> {
+    const result: Array<{ skillPath: string; skillName: string; projectType?: string }> = [];
+    const entries = await FileSystemUtils.readDirectory(skillsDir);
+
+    // Known project-type folder names (they contain sub-skill folders)
+    const knownProjectTypes = [
+      'wordpress', 'wordpress-plugin', 'wordpress-theme',
+      'perfex-module', 'laravel-package', 'node-service',
+      'generic-webapp', 'backend-api', 'frontend-app', 'multi-stack',
+    ];
+
+    for (const entry of entries) {
+      const entryPath = path.join(skillsDir, entry);
+      const stats = await FileSystemUtils.stat(entryPath);
+      if (!stats.isDirectory()) continue;
+
+      if (knownProjectTypes.includes(entry)) {
+        // It's a project-type folder — walk its children
+        const subEntries = await FileSystemUtils.readDirectory(entryPath);
+        for (const sub of subEntries) {
+          const subPath = path.join(entryPath, sub);
+          const subStats = await FileSystemUtils.stat(subPath);
+          if (subStats.isDirectory() && await FileSystemUtils.fileExists(path.join(subPath, 'skill.md'))) {
+            result.push({ skillPath: subPath, skillName: sub, projectType: entry });
+          }
+        }
+      } else {
+        // Cross-cutting skill
+        if (await FileSystemUtils.fileExists(path.join(entryPath, 'skill.md'))) {
+          result.push({ skillPath: entryPath, skillName: entry });
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Prompt user to bootstrap memory if historical specs are found
+   */
+  private async checkAndBootstrapMemory(heraspecPath: string, projectPath: string, spinner: ora.Ora): Promise<void> {
+    const memorySkillDir = path.join(heraspecPath, SKILLS_DIR_NAME, 'project-memory');
+    if (!(await FileSystemUtils.fileExists(memorySkillDir))) {
+      // Automatically install project-memory skill
+      spinner.stop();
+      try {
+        const { SkillCommand } = await import('../commands/skill.js');
+        const skillCommand = new SkillCommand();
+        console.log(chalk.cyan('\n📦 Auto-installing recommended skill: "project-memory"'));
+        await skillCommand.add('project-memory', undefined, projectPath);
+        console.log(); // Spacing
+      } catch (err) {
+        spinner.start();
+        return; // failed to install, silently skip memory bootstrap
+      }
+      spinner.start();
+    }
+
+    // Checking if there are markdown files in specs or archives
+    const specsDir = path.join(heraspecPath, SPECS_DIR_NAME);
+    const archivesDir = path.join(heraspecPath, ARCHIVES_DIR_NAME);
+    let hasHistoricalData = false;
+
+    for (const dir of [specsDir, archivesDir]) {
+      if (await FileSystemUtils.fileExists(dir)) {
+        const entries = await FileSystemUtils.readDirectory(dir);
+        if (entries.some(e => e.endsWith('.md'))) {
+          hasHistoricalData = true;
+          break;
+        }
+        // Sub-directories (e.g., changes/archives are folders with md in them)
+        if (!hasHistoricalData) {
+           for (const e of entries) {
+              const fullPath = path.join(dir, e);
+              const st = await FileSystemUtils.stat(fullPath);
+              if (st.isDirectory()) {
+                const subEntries = await FileSystemUtils.readDirectory(fullPath);
+                if (subEntries.some(sub => sub.endsWith('.md'))) {
+                  hasHistoricalData = true;
+                  break;
+                }
+              }
+           }
+        }
+      }
+    }
+
+    if (!hasHistoricalData) return;
+
+    // Check if memory store already has significant data (>0 ops) to avoid bugging them every time
+    const MEMORY_DIR_NAME = 'memory';
+    const DB_FILENAME = 'heraspec-memory.db';
+    const memoryDbPath = path.join(heraspecPath, MEMORY_DIR_NAME, DB_FILENAME);
+    if (await FileSystemUtils.fileExists(memoryDbPath)) {
+        // We'll skip forcing a prompt if the DB exists. The user can run heraspec memory bootstrap manually.
+        // Or we could check the size, but skipping is safer to avoid annoyance.
+        return;
+    }
+
+    // Stop the spinner before launching an interactive prompt to avoid stdout conflicts
+    spinner.stop();
+    
+    console.log(chalk.cyan('\n💡 Tip: Your project has historical specs.'));
+    const { confirm } = await import('@inquirer/prompts');
+    const answer = await confirm({
+      message: 'Would you like to bootstrap the "project-memory" system from these existing specs?',
+      default: true,
+    });
+
+    if (answer) {
+      try {
+        const memoryCommand = new MemoryCommand();
+        await memoryCommand.bootstrap({ yes: true }, projectPath);
+      } catch (error) {
+        console.log(chalk.red(`Bootstrap failed: ${error instanceof Error ? error.message : 'Unknown'}`));
+      }
+    }
+    
+    // Restart spinner for the rest of the flow
+    spinner.start();
+  }
+
 
   /**
    * Get the knowledge source directory from CLI package

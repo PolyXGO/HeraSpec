@@ -58,11 +58,17 @@ export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
   },
   'project-memory': {
     templateFileName: 'project-memory-skill.md',
+    viFileName: 'project-memory-skill.vi.md',
     isCrossCutting: true,
   },
   'smart-explore': {
     templateFileName: 'smart-explore-skill.md',
     isCrossCutting: true,
+  },
+  'deploy-documentation': {
+    templateFileName: 'deploy-documentation-skill.md',
+    isCrossCutting: true,
+    resourceDirs: ['templates'],
   },
   
   // Perfex module skills

@@ -432,6 +432,20 @@ memoryCmd
     }
   });
 
+memoryCmd
+  .command('bootstrap')
+  .description('Import historical specs and archives into memory')
+  .option('--yes', 'Apply changes without confirmation')
+  .action(async (options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.bootstrap({ yes: options.yes }, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
 // Explore commands
 const exploreCmd = program
   .command('explore')
