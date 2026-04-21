@@ -673,9 +673,7 @@ export class InitCommand {
     if (!hasHistoricalData) return;
 
     // Check if memory store already has significant data (>0 ops) to avoid bugging them every time
-    const MEMORY_DIR_NAME = 'memory';
-    const DB_FILENAME = 'heraspec-memory.db';
-    const memoryDbPath = path.join(heraspecPath, MEMORY_DIR_NAME, DB_FILENAME);
+    const memoryDbPath = path.join(heraspecPath, 'memory', 'heraspec-memory.db');
     if (await FileSystemUtils.fileExists(memoryDbPath)) {
         // We'll skip forcing a prompt if the DB exists. The user can run heraspec memory bootstrap manually.
         // Or we could check the size, but skipping is safer to avoid annoyance.

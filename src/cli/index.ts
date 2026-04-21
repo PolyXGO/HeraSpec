@@ -446,6 +446,19 @@ memoryCmd
     }
   });
 
+memoryCmd
+  .command('analytics')
+  .description('Show token usage and economic savings metrics')
+  .action(async () => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.analytics('.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
 // Explore commands
 const exploreCmd = program
   .command('explore')

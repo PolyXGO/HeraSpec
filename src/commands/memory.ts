@@ -554,4 +554,94 @@ export class MemoryCommand {
       store.close();
     }
   }
+
+  /**
+   * heraspec memory analytics - Show token usage and economic savings metrics
+   */
+  async analytics(projectPath: string = '.'): Promise<void> {
+    try {
+      const store = new MemoryStore(projectPath);
+      store.open();
+
+      try {
+        const stats = store.getAnalytics();
+
+        if (stats.length === 0) {
+           console.log(chalk.yellow('\n📊 No memory analytics data found yet.\n'));
+           return;
+        }
+
+        console.log(chalk.cyan('\n📊 HeraSpec Memory Token Economics\n'));
+        console.log(chalk.gray('Comparing estimated token usage: With Memory vs Without Memory.\n'));
+
+        // Output table
+        console.log('═'.repeat(90));
+        console.log(
+          chalk.bold('Project'.padEnd(25)) + 
+          chalk.bold('Ops'.padEnd(6)) + 
+          chalk.bold('Tokens (With Memory)'.padEnd(22)) + 
+          chalk.bold('Tokens (Without)'.padEnd(20)) +
+          chalk.bold('Savings'.padEnd(10))
+        );
+        console.log('─'.repeat(90));
+
+        let overallWith = 0;
+        let overallWithout = 0;
+
+        for (const s of stats) {
+           overallWith += s.tokensWithMemory;
+           overallWithout += s.tokensWithoutMemory;
+
+           const pName = s.project.length > 22 ? s.project.substring(0, 20) + '..' : s.project.padEnd(25);
+           const ops = String(s.totalOps).padEnd(6);
+           
+           // Format numbers
+           const withMem = '~' + this.formatNumber(s.tokensWithMemory);
+           const withoutMem = '~' + this.formatNumber(s.tokensWithoutMemory);
+           const savings = chalk.green('+' + s.savingsPercent.toFixed(0) + '%');
+
+           console.log(`${pName}${ops}${withMem.padEnd(22)}${withoutMem.padEnd(20)}${savings}`);
+        }
+        
+        console.log('─'.repeat(90));
+        const totalSavingsPct = overallWithout > 0 ? ((overallWithout - overallWith) / overallWithout) * 100 : 0;
+        console.log(
+          chalk.bold('TOTAL'.padEnd(31)) + 
+          chalk.bold(`~${this.formatNumber(overallWith)}`.padEnd(22)) + 
+          chalk.bold(`~${this.formatNumber(overallWithout)}`.padEnd(20)) +
+          chalk.bold(chalk.green(`+${totalSavingsPct.toFixed(0)}%`))
+        );
+        console.log('═'.repeat(90) + '\n');
+        
+        // Draw ASCII Chart for top 3
+        console.log(chalk.cyan('📈 Top Savings Chart (Tokens Avoided)\n'));
+        const MAX_BAR_LEN = 40;
+        
+        // Scale factor
+        const maxSavings = Math.max(...stats.map(s => s.savingsTokens));
+        
+        for (const s of stats.slice(0, 5)) {
+           if (s.savingsTokens <= 0) continue;
+           const barLen = Math.ceil((s.savingsTokens / maxSavings) * MAX_BAR_LEN);
+           const bar = '█'.repeat(barLen);
+           
+           console.log(` ${s.project.substring(0, 15).padEnd(16)} | ${chalk.green(bar)} ${chalk.green('+' + this.formatNumber(s.savingsTokens))} tokens`);
+        }
+
+        console.log('\n' + chalk.gray('💡 Note: "Tokens Without" assume reading 50k tokens (average codebase context) per operation if memory was absent.') + '\n');
+
+      } finally {
+        store.close();
+      }
+    } catch (error) {
+      console.error(chalk.red(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      process.exitCode = 1;
+    }
+  }
+
+  private formatNumber(num: number): string {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return String(Math.floor(num));
+  }
 }

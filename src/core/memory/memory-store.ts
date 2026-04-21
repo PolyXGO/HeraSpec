@@ -13,6 +13,7 @@ import type {
   Session,
   MemoryStatus,
   ObservationType,
+  ProjectAnalytics,
 } from './memory-types.js';
 import { estimateTokens } from './memory-types.js';
 
@@ -341,6 +342,89 @@ export class MemoryStore {
       estimatedTotalTokens: totalTokens,
       dbSizeBytes,
     };
+  }
+
+  // ============ Analytics ============
+
+  /**
+   * Get token saving statistics for all known projects in memory
+   */
+  getAnalytics(): ProjectAnalytics[] {
+    this.ensureOpen();
+    
+    // Default factor: Cost applied per context read if memory wasn't used ~ 50,000 tokens
+    const TOKENS_WITHOUT_MEMORY_PER_OP = 50000;
+    // Default factor: Cost of context generation if memory IS used ~ 3,000 tokens
+    const CONTEXT_GENERATION_OVERHEAD = 3000; 
+
+    const obsQuery = this.db.prepare(`
+      SELECT 
+        project, 
+        COUNT(*) as obs_count, 
+        SUM(discovery_tokens) as total_discovery,
+        SUM(length(narrative)) as total_chars
+      FROM observations 
+      GROUP BY project
+    `).all();
+
+    const sumQuery = this.db.prepare(`
+      SELECT 
+        project, 
+        COUNT(*) as sum_count,
+        SUM(length(learned) + length(completed)) as total_chars
+      FROM session_summaries 
+      GROUP BY project
+    `).all();
+
+    const projectData = new Map<string, any>();
+
+    for (const row of obsQuery) {
+      if (!row.project) continue;
+      projectData.set(row.project, {
+        ops: row.obs_count,
+        discovery: row.total_discovery || 0,
+        textChars: row.total_chars || 0
+      });
+    }
+
+    for (const row of sumQuery) {
+      if (!row.project) continue;
+      const data = projectData.get(row.project) || { ops: 0, discovery: 0, textChars: 0 };
+      data.ops += row.sum_count;
+      data.textChars += (row.total_chars || 0);
+      projectData.set(row.project, data);
+    }
+
+    const results: ProjectAnalytics[] = [];
+
+    for (const [project, data] of projectData.entries()) {
+      // Tokens with memory: Actual discovery tokens used + narrative estimate if discovery=0 + context generation overhead
+      const contentTokens = data.discovery > 0 ? data.discovery : Math.ceil(data.textChars / 4);
+      let tokensWithMemory = contentTokens + (data.ops * CONTEXT_GENERATION_OVERHEAD);
+
+      // Tokens without memory: Imagine re-reading codebase blindly (50k context per session/action)
+      let tokensWithoutMemory = data.ops * TOKENS_WITHOUT_MEMORY_PER_OP;
+
+      // Ensure it's not negative or weird
+      if (tokensWithoutMemory < tokensWithMemory) {
+        tokensWithoutMemory = tokensWithMemory; // Failsafe
+      }
+
+      let savingsTokens = tokensWithoutMemory - tokensWithMemory;
+      let savingsPercent = tokensWithoutMemory > 0 ? (savingsTokens / tokensWithoutMemory) * 100 : 0;
+
+      results.push({
+        project,
+        totalOps: data.ops,
+        tokensWithMemory,
+        tokensWithoutMemory,
+        savingsTokens,
+        savingsPercent
+      });
+    }
+
+    // Sort by savings highest to lowest
+    return results.sort((a, b) => b.savingsTokens - a.savingsTokens);
   }
 
   // ============ Helpers ============

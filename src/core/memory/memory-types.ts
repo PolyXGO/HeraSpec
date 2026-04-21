@@ -159,6 +159,17 @@ export interface MemoryStatus {
   dbSizeBytes: number;
 }
 
+// ============ Analytics Types ============
+
+export interface ProjectAnalytics {
+  project: string;
+  totalOps: number;
+  tokensWithMemory: number;
+  tokensWithoutMemory: number;
+  savingsTokens: number;
+  savingsPercent: number;
+}
+
 // ============ Utility Constants ============
 
 export const OBSERVATION_TYPE_ICONS: Record<ObservationType, string> = {
