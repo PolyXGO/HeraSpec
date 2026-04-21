@@ -36,7 +36,9 @@ build({
   external: Object.keys(packageJson.dependencies || {}).concat(
     Object.keys(packageJson.peerDependencies || {})
   ),
-  // No banner needed - source code already handles createRequire
+  banner: {
+    js: `import { createRequire as __createRequire } from 'module'; const require = __createRequire(import.meta.url);`,
+  },
   sourcemap: true,
   minify: false,
 }).then(() => {

@@ -1,0 +1,27 @@
+{
+  "id": "php-codeigniter-rise-cms",
+  "name": "RISE CRM",
+  "runtime": "php",
+  "runtimeVersion": "^8.1",
+  "framework": "codeigniter",
+  "frameworkVersion": "^4.0",
+  "cms": "rise-cms",
+  "cmsType": "monolith-with-plugins",
+  "description": "CodeIgniter 4 CRM with plugin-based extensibility and Data Builder API surfaces",
+  "keyFeatures": [
+    "CodeIgniter 4 monolith with plugin-based extensibility",
+    "Data Builder plugin with REST and GraphQL APIs",
+    "Hook and lifecycle extension system for plugins",
+    "API token management, scopes, and rate controls",
+    "Webhook dispatch and delivery logging",
+    "Public API docs and sandbox flows"
+  ],
+  "directorySignature": [
+    "app",
+    "plugins",
+    "system",
+    "writable"
+  ],
+  "analysisFile": "structure.md",
+  "lastUpdated": "2026-04-04"
+}

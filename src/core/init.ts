@@ -113,22 +113,163 @@ export class InitCommand {
   ): Promise<void> {
     const projectMdPath = path.join(heraspecPath, HERASPEC_MARKERS.PROJECT_MD);
     const configYamlPath = path.join(heraspecPath, HERASPEC_MARKERS.CONFIG_YAML);
+    const newProjectTemplate = TemplateManager.getProjectTemplate();
 
-    // Create project.md
-    if (!(await FileSystemUtils.fileExists(projectMdPath)) || !skipExisting) {
-      await FileSystemUtils.writeFile(
-        projectMdPath,
-        TemplateManager.getProjectTemplate()
-      );
+    // Handle project.md with smart merge
+    const projectExists = await FileSystemUtils.fileExists(projectMdPath);
+
+    if (!projectExists) {
+      // New project — write fresh template
+      await FileSystemUtils.writeFile(projectMdPath, newProjectTemplate);
+    } else if (skipExisting) {
+      // Re-init: check if template has new content that existing file doesn't have
+      const existingContent = await FileSystemUtils.readFile(projectMdPath);
+      const hasChanges = this.detectTemplateChanges(existingContent, newProjectTemplate);
+
+      if (hasChanges) {
+        // Create numbered backup
+        const backupPath = await this.createNumberedBackup(projectMdPath, heraspecPath);
+        const backupName = path.basename(backupPath);
+
+        // Write merged content: new template sections + merge reference
+        const mergedContent = this.buildMergedProjectMd(existingContent, newProjectTemplate, backupName);
+        await FileSystemUtils.writeFile(projectMdPath, mergedContent);
+      }
+      // else: no template changes, keep existing file as-is
+    } else {
+      // First init but file somehow exists (edge case) — overwrite
+      await FileSystemUtils.writeFile(projectMdPath, newProjectTemplate);
     }
 
-    // Create config.yaml
-    if (!(await FileSystemUtils.fileExists(configYamlPath)) || !skipExisting) {
+    // Create config.yaml (only if not exists)
+    if (!(await FileSystemUtils.fileExists(configYamlPath))) {
       await FileSystemUtils.writeFile(
         configYamlPath,
         TemplateManager.getConfigTemplate()
       );
     }
+  }
+
+  /**
+   * Detect if the new template has sections that the existing file lacks
+   */
+  private detectTemplateChanges(existingContent: string, newTemplate: string): boolean {
+    // Extract ## section headers from both
+    const sectionRegex = /^## .+$/gm;
+    const existingSections = new Set(
+      (existingContent.match(sectionRegex) || []).map(s => s.trim().toLowerCase())
+    );
+    const newSections = (newTemplate.match(sectionRegex) || []).map(s => s.trim().toLowerCase());
+
+    // Check if any new section is missing from existing
+    for (const section of newSections) {
+      if (!existingSections.has(section)) {
+        return true; // New section found
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Create numbered backup: project.back1.md, project.back2.md, etc.
+   */
+  private async createNumberedBackup(filePath: string, dirPath: string): Promise<string> {
+    const ext = path.extname(filePath);
+    const base = path.basename(filePath, ext);
+    let backupNumber = 1;
+
+    while (true) {
+      const backupPath = path.join(dirPath, `${base}.back${backupNumber}${ext}`);
+      if (!(await FileSystemUtils.fileExists(backupPath))) {
+        // Copy existing file to backup
+        await FileSystemUtils.copyFile(filePath, backupPath);
+        return backupPath;
+      }
+      backupNumber++;
+      if (backupNumber > 99) break; // Safety limit
+    }
+
+    // Fallback: overwrite last backup
+    const fallbackPath = path.join(dirPath, `${base}.back99${ext}`);
+    await FileSystemUtils.copyFile(filePath, fallbackPath);
+    return fallbackPath;
+  }
+
+  /**
+   * Build merged project.md:
+   * - Keeps all existing user content (descriptions, tech stack, conventions)
+   * - Adds any NEW sections from the template that don't exist yet
+   * - Adds a merge note at the top referencing the backup
+   */
+  private buildMergedProjectMd(
+    existingContent: string,
+    newTemplate: string,
+    backupFileName: string
+  ): string {
+    // Parse sections from both files
+    const existingSections = this.parseSections(existingContent);
+    const templateSections = this.parseSections(newTemplate);
+
+    // Build merged content: existing sections take priority, new sections are appended
+    const mergedParts: string[] = [];
+    const existingSectionHeaders = new Set(
+      existingSections.map(s => s.header.trim().toLowerCase())
+    );
+
+    // 1. Add merge notice at top
+    const mergeNote = `<!-- HeraSpec Update: Template updated. Previous version backed up to "${backupFileName}". New sections (if any) have been appended below. -->\n`;
+    mergedParts.push(mergeNote);
+
+    // 2. Keep all existing content intact
+    mergedParts.push(existingContent.trimEnd());
+
+    // 3. Append any NEW sections from template that don't exist in current file
+    const newSections: { header: string; content: string }[] = [];
+    for (const section of templateSections) {
+      if (!existingSectionHeaders.has(section.header.trim().toLowerCase())) {
+        newSections.push(section);
+      }
+    }
+
+    if (newSections.length > 0) {
+      mergedParts.push('\n\n<!-- New sections added by HeraSpec update -->');
+      for (const section of newSections) {
+        mergedParts.push(`\n${section.header}\n${section.content.trimEnd()}`);
+      }
+    }
+
+    return mergedParts.join('\n').trimEnd() + '\n';
+  }
+
+  /**
+   * Parse markdown sections (## headers) from content
+   */
+  private parseSections(content: string): { header: string; content: string }[] {
+    const sections: { header: string; content: string }[] = [];
+    const lines = content.split('\n');
+    let currentHeader = '';
+    let currentContent: string[] = [];
+
+    for (const line of lines) {
+      if (line.match(/^## /)) {
+        // Save previous section
+        if (currentHeader) {
+          sections.push({ header: currentHeader, content: currentContent.join('\n') });
+        }
+        currentHeader = line;
+        currentContent = [];
+      } else if (currentHeader) {
+        currentContent.push(line);
+      }
+    }
+
+    // Save last section
+    if (currentHeader) {
+      sections.push({ header: currentHeader, content: currentContent.join('\n') });
+    }
+
+    return sections;
   }
 
   private async updateAgentsFile(agentsPath: string, alreadyInitialized: boolean): Promise<void> {
@@ -177,6 +318,28 @@ export class InitCommand {
         }
     }
 
+    // Update Core Workflow section (includes backup ignore rule, memory workflow, etc.)
+    const coreWorkflowMarker = '## Core Workflow';
+    const coreWorkflowEndMarker = '## Skills System';
+    const coreWorkflowEndIndex = fullTemplate.indexOf(coreWorkflowEndMarker);
+    const coreWorkflowStartIndex = fullTemplate.indexOf(coreWorkflowMarker);
+
+    if (coreWorkflowStartIndex !== -1 && coreWorkflowEndIndex !== -1) {
+      const coreWorkflowSection = fullTemplate.substring(coreWorkflowStartIndex, coreWorkflowEndIndex).trim();
+      
+      if (existingContent.includes(coreWorkflowMarker)) {
+        existingContent = this.replaceSection(existingContent, coreWorkflowMarker, coreWorkflowSection);
+      } else {
+        // Append after Safety Rules
+        const safetyEndPos = existingContent.indexOf('\n## ', existingContent.indexOf(safetyMarker) + safetyMarker.length);
+        if (safetyEndPos !== -1) {
+          const before = existingContent.substring(0, safetyEndPos).trimEnd();
+          const after = existingContent.substring(safetyEndPos);
+          existingContent = before + '\n\n' + coreWorkflowSection + '\n\n' + after;
+        }
+      }
+    }
+
     // Update Skills section
     let updatedContent = existingContent;
     if (existingContent.includes(skillsSectionMarker) || existingContent.includes('## Skills system')) {
@@ -188,6 +351,23 @@ export class InitCommand {
     if (updatedContent !== existingContent) {
         await FileSystemUtils.writeFile(agentsPath, updatedContent);
     }
+  }
+
+  /**
+   * Generic section replacer: replace content from marker to next ## header
+   */
+  private replaceSection(content: string, sectionMarker: string, newSection: string): string {
+    const startIndex = content.indexOf(sectionMarker);
+    if (startIndex === -1) return content;
+
+    let endIndex = content.indexOf('\n## ', startIndex + sectionMarker.length);
+    if (endIndex === -1) {
+      endIndex = content.length;
+    }
+
+    const before = content.substring(0, startIndex).trimEnd();
+    const after = content.substring(endIndex);
+    return before + '\n\n' + newSection + (after.trimStart().startsWith('\n') ? '' : '\n\n') + after;
   }
 
   private replaceSkillsSection(existingContent: string, newSkillsSection: string): string {

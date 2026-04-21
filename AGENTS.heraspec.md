@@ -6,7 +6,50 @@ This document defines the workflow for AI agents working with HeraSpec.
 
 - **NO AUTO-COMMIT**: Agent MUST NOT perform `git commit` or `git push` autonomously. This task is reserved for the User unless explicitly ordered.
 - **NO AUTO-PUBLISH**: Agent MUST NOT perform `npm publish` or trigger automated releases/deployments autonomously.
+- **SKILL PREREQUISITE**: If a task maps to a skill (e.g., "Generate documentation"), you **MUST** verify the skill folder exists in `heraspec/skills/`. If missing:
+  - **Preferred**: Proactively install it via `heraspec skill add <name>` (e.g., `heraspec skill add documents`) if you have terminal access.
+  - **Fallback**: If you cannot install it, **STOP** and ask the user to add it. **DO NOT** attempt manual generation without the skill.
 - **USER CONFIRMATION**: For destructive actions or public releases, always request explicit User approval first.
+
+### Restricted Commands (REQUIRE USER CONFIRMATION)
+
+The following commands are classified by risk level. You **MUST NOT** execute them without explicit user confirmation/approval in the chat, especially if they are outside the source workspace or involve deletion.
+
+#### GROUP 1 – EXTREMELY DANGEROUS (DATA DESTRUCTION, HARD / IMPOSSIBLE TO RECOVER)
+- `rm -rf` : Recursive delete + no prompt, can wipe entire system
+- `rm -r` : Delete directory and all contents
+- `rm` : Delete file directly, bypassing trash
+- `unlink` : Delete file at filesystem level, cannot undo
+- `shred` : Overwrite data multiple times to make it unrecoverable
+- `wipe` : Permanently wipe data on disk
+- `dd` : Write/copy raw blocks, easily destroy disk or partition
+- `mkfs`, `mkfs.ext4`, `mkfs.xfs` : Create new filesystem, wiping old data
+- `format`, `Format-Volume` : Format drive/volume
+
+#### GROUP 2 – HIGH DANGER (DELETE DIRECTORY / MULTIPLE FILES)
+- `rmdir` : Delete directory
+- `rd`, `rmdir /s` : Windows delete directory
+- `Remove-Item -Recurse`, `Remove-Item` : PowerShell delete
+- `del /s`, `erase /s` : CMD batch delete
+
+#### GROUP 3 – MEDIUM DANGER (DELETE FILE / OVERWRITE)
+- `del`, `erase` : Delete file
+- `Clear-Content` : Clear file content
+- `cp --remove-destination` : Overwrite destination by deleting first
+
+#### GROUP 4 – INDIRECT DANGER (DATA LOSS)
+- `mv` : Move / overwrite file, old data lost
+- `rsync --delete` : Delete file at destination if not in source
+- `install` : Overwrite system files
+
+#### GROUP 5 – DISK / PARTITION MANAGEMENT
+- `fdisk`, `cfdisk`, `parted`, `diskpart` : Partition management
+- `mount`, `umount` : Filesystem mounting
+
+#### GROUP 6 – LESS DANGEROUS (POTENTIAL CONSEQUENCES)
+- `truncate` : Cutt off file content
+- `chown`, `chmod` : Change ownership/permissions
+- `attrib` : Change attributes
 
 ## Core Workflow
 
@@ -17,6 +60,8 @@ This document defines the workflow for AI agents working with HeraSpec.
 - Tech stack and conventions
 - Existing architecture patterns
 - Coding standards
+
+> **IGNORE backup files**: Files like \`project.back1.md\`, \`project.back2.md\`, etc. are automatic backups created during \`heraspec init\` updates. NEVER read or reference them unless explicitly asked by the user. Only \`project.md\` is the source of truth.
 
 **Then scaffold:**
 - `heraspec/changes/<slug>/` - Create proposal.md, tasks.md, design.md (optional)
@@ -76,11 +121,11 @@ This document defines the workflow for AI agents working with HeraSpec.
 - Task: `(skill: ui-ux)`
 - Agent reads: `heraspec/skills/ui-ux/skill.md`
 - Agent MUST use search scripts before implementing:
-  ```bash
-  # Search for design intelligence
-  python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --domain <domain>
-  python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --stack <stack>
-  ```
+   ```bash
+   # Search for design intelligence
+   python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --domain <domain>
+   python3 heraspec/skills/ui-ux/scripts/search.py "<keyword>" --stack <stack>
+   ```
 - Agent synthesizes search results
 - Agent implements with proper colors, fonts, styles from search results
 - Agent verifies with pre-delivery checklist
@@ -95,18 +140,16 @@ This document defines the workflow for AI agents working with HeraSpec.
 
 **Special case - Plugin Check skill:**
 - Task: `(projectType: wordpress-plugin, skill: plugin-check)`
-- **Installation**: Run `heraspec skill add plugin-check --project-type wordpress-plugin` to add this skill.
-- **Skill Location**: Agent MUST read `skill.md` from `heraspec/skills/wordpress-plugin/plugin-check/skill.md` inside the **CURRENT** plugin directory.
-- **Placeholder Warning**: The example plugin `polyutilities` is just a placeholder. Agent MUST determine the actual target plugin content from the user request or working directory.
-- Agent MUST follow the safety prompt: "Ensure careful handling and verify that related features still function correctly."
-- Agent executes iteratively until all issues are resolved.
-- **Safety**: DO NOT delete `.sh` or `.md` files. They are excluded development assets.
+- Install: `heraspec skill add plugin-check --project-type wordpress-plugin`
+- Agent reads: `heraspec/skills/wordpress-plugin/plugin-check/skill.md`
+- Agent runs WordPress Plugin Check (PCP) tool
+- Agent fixes coding standard issues iteratively until all pass
 
-**Special case - Plugin Directory Compliance skill:**
+**Special case - Plugin Directory skill:**
 - Task: `(projectType: wordpress-plugin, skill: plugin-directory)`
-- **Installation**: Run `heraspec skill add plugin-directory --project-type wordpress-plugin` to add this skill to your project.
-- **Purpose**: Review WordPress plugin source code against all **18 WordPress Plugin Directory Guidelines** before submission to WordPress.org.
-- Agent MUST perform systematic checks on each guideline (Guideline 1-18):
+- Install: `heraspec skill add plugin-directory --project-type wordpress-plugin`
+- Agent reads: `heraspec/skills/wordpress-plugin/plugin-directory/skill.md`
+- Agent MUST review plugin against **18 WordPress.org Directory Guidelines**:
   1. GPL Compatibility
   2. Developer Responsibility
   3. Stable Version Availability
@@ -125,14 +168,13 @@ This document defines the workflow for AI agents working with HeraSpec.
   16. Complete Plugin Required
   17. Trademark and Copyright
   18. Directory Maintenance Rights
-- Agent MUST generate a **Compliance Report** with:
+- Agent generates a **Compliance Report** with:
   - ✅ Passed items
-  - ⚠️ Items needing review
+  - ⚠️ Items needing review  
   - ❌ Violations with file paths and line numbers
-- **CRITICAL**: Agent MUST present the full report and **wait for user confirmation** before making any changes.
-- Reference guideline numbers (e.g., "Guideline 7: User Tracking Consent") for easy cross-checking.
-- **Example Prompt**:
-  > "Use skill plugin-directory to review plugin `[PLUGIN_NAME]` for WordPress.org compliance. Generate a compliance report with all 18 guidelines and wait for my approval before fixing."
+- **CRITICAL**: Agent MUST present full report and **wait for user confirmation** before making changes
+- Reference guideline numbers (e.g., "Guideline 7: User Tracking Consent")
+
 
 - Follow tasks.md
 - Mark tasks completed: `- [x]`
@@ -169,27 +211,29 @@ Tasks grouped by project type and skill:
 **CRITICAL: Mandatory Prerequisite Check**
 
 1. **Stop & Verify**: If you are asked to implement a task requiring a skill (e.g., "Generate documentation...", "Create UI/UX...", etc.), you MUST first check if the skill folder exists in `heraspec/skills/`.
-2. **Missing Skill = STOP & TIP**: If the skill folder does NOT exist, the Agent MUST STOP IMMEDIATELY.
-   - **DO NOT** create a task plan, do **NOT** output "Initializing documentation task...", and do **NOT** attempt manual generation.
-   - **Output Tip**: Simply inform the user and suggest the command:
+2. **Missing Skill = AUTO-INSTALL OR STOP**: If the skill folder does NOT exist:
+   - **Option A (Preferred)**: If you can run commands, execute `heraspec skill add <skill-name>` immediately.
+   - **Option B (Fallback)**: If you cannot run commands, **STOP** and ask the user to run it.
      > "Tip: Add the 'documents' skill for premium HTML & Landing Page support: 
      > heraspec skill add documents"
-   - (Adjust tip text for other skills like `ui-ux`).
-3. **Execute After Install**: Only after the skill folder is created, read the `skill.md` and proceed with the task.
+   - **DO NOT** create a task plan or attempt manual generation without the skill language.
+3. **Execute After Install**: Only after the skill folder is created (or installed), read the `skill.md` and proceed with the task.
 
 **Example prompt for Documents skill:**
 If you need to generate multi-format documentation, use this prompt:
 > "Generate documentation with skill documents for [project-name]. Include:
-> - Concise overview (documentation.txt)
-> - Technical Markdown (documentation.md)
-> - Interactive HTML (documentation.html)
-> - Premium Documentation Landing Page (documentation-landing-page.html)"
+> - Concise overview (documentations/documentation.txt)
+> - Technical Markdown (documentations/documentation.md)
+> - Interactive HTML (documentations/documentation.html)
+> - Premium Documentation Landing Page (documentations/documentation-landing-page.html)
+> - CRITICAL: Save all files in the /documentations directory (create it if missing)."
 
 **Dynamic Documentation Generation**:
 When generating documentation, do NOT simply fill a template. The Agent MUST:
-1. **Design** a custom layout and content structure suitable for the project type.
-2. **Synchronize** with the `ui-ux` skill for premium visual design (colors, typography, animations).
-3. **Scan All Specs**: If project-wide, read `heraspec/project.md` and all files in `heraspec/specs/` to synthesize the content.
+1. **Create** the `/documentations` directory if it does not exist.
+2. **Design** a custom layout and content structure suitable for the project type.
+3. **Synchronize** with the `ui-ux` skill for premium visual design (colors, typography, animations).
+4. **Scan All Specs**: If project-wide, read `heraspec/project.md` and all files in `heraspec/specs/` to synthesize the content.
 
 ### Skill Discovery & Usage
 
@@ -218,11 +262,23 @@ Example with multiple skills in one change:
 
 **Key rule**: Switch skill.md when switching task groups!
 
-## Rules
+## Memory-Aware Development (Complementary)
 
-1. **Specs first, tasks second, implementation last.**
-2. **Always use Skills**: When task has skill tag, MUST read and follow skill.md
-3. Never modify source-of-truth specs directly.
-4. Delta specs go in `heraspec/specs/<slug>/` (NOT in changes folder).
-5. Always wait for approval before implementation.
-6. **One skill per task group**: Each task group should use one skill consistently.
+If \`heraspec/skills/project-memory/\` exists, the agent can optionally use memory to maintain context:
+
+### When to Use Memory
+- **Complex new feature**: Search memory first → \`heraspec memory search "feature keywords"\`
+- **After significant work**: Log observation → \`heraspec memory log --type feature --title "..." --concepts "..."\`
+- **End of session**: Summarize → \`heraspec memory summarize --request "..." --completed "..."\`
+- **Start of complex session**: Read context → \`heraspec memory context\`
+
+### When to SKIP Memory
+- Simple bug fixes, typo corrections, formatting changes
+- Trivial tasks that take < 5 minutes
+- When doing what the agent's built-in context already covers
+
+### Smart Code Exploration
+If \`heraspec/skills/smart-explore/\` exists, prefer token-efficient exploration:
+- \`heraspec explore outline <file>\` → View structure (~1K tokens vs ~12K full file)
+- \`heraspec explore search "<query>" <path>\` → Find symbols across codebase
+- \`heraspec explore unfold <file> <symbol>\` → Read just one function

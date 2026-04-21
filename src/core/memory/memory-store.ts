@@ -1,0 +1,409 @@
+/**
+ * HeraSpec Memory Store
+ * SQLite-based CRUD operations for observations and session summaries
+ */
+import path from 'path';
+import { HERASPEC_DIR_NAME, MEMORY_DIR_NAME } from '../config.js';
+import { initializeSchema, needsMigration, runMigrations } from './memory-schema.js';
+import type {
+  Observation,
+  ObservationInput,
+  SessionSummary,
+  SessionSummaryInput,
+  Session,
+  MemoryStatus,
+  ObservationType,
+} from './memory-types.js';
+import { estimateTokens } from './memory-types.js';
+
+const DB_FILENAME = 'heraspec-memory.db';
+
+export class MemoryStore {
+  private db: any;
+  private dbPath: string;
+
+  constructor(projectPath: string = '.') {
+    this.dbPath = path.join(projectPath, HERASPEC_DIR_NAME, MEMORY_DIR_NAME, DB_FILENAME);
+    this.db = null;
+  }
+
+  /**
+   * Open database connection, init schema if needed
+   */
+  open(): void {
+    if (this.db) return;
+
+    // Dynamic import better-sqlite3 (native module)
+    let Database: any;
+    try {
+      Database = require('better-sqlite3');
+    } catch {
+      throw new Error(
+        'better-sqlite3 is required for HeraSpec memory. Install it with: npm install better-sqlite3'
+      );
+    }
+
+    // Ensure directory exists
+    const dir = path.dirname(this.dbPath);
+    const fs = require('fs');
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    this.db = new Database(this.dbPath);
+
+    // Initialize or migrate schema
+    if (needsMigration(this.db)) {
+      runMigrations(this.db);
+    }
+  }
+
+  /**
+   * Close database connection
+   */
+  close(): void {
+    if (this.db) {
+      this.db.close();
+      this.db = null;
+    }
+  }
+
+  /**
+   * Get the raw database reference (for advanced queries)
+   */
+  getDb(): any {
+    this.ensureOpen();
+    return this.db;
+  }
+
+  private ensureOpen(): void {
+    if (!this.db) {
+      this.open();
+    }
+  }
+
+  // ============ Observations ============
+
+  /**
+   * Add a new observation
+   */
+  addObservation(input: ObservationInput): Observation {
+    this.ensureOpen();
+
+    const now = new Date();
+    const sessionId = input.sessionId || this.generateSessionId();
+    const project = input.project || this.detectProjectName();
+
+    const stmt = this.db.prepare(`
+      INSERT INTO observations (session_id, project, type, title, narrative, concepts, files_read, files_modified, discovery_tokens, created_at, created_at_epoch)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const result = stmt.run(
+      sessionId,
+      project,
+      input.type,
+      input.title,
+      input.narrative || '',
+      JSON.stringify(input.concepts || []),
+      JSON.stringify(input.filesRead || []),
+      JSON.stringify(input.filesModified || []),
+      input.discoveryTokens || 0,
+      now.toISOString(),
+      now.getTime()
+    );
+
+    return this.getObservationById(result.lastInsertRowid as number)!;
+  }
+
+  /**
+   * Get observation by ID
+   */
+  getObservationById(id: number): Observation | null {
+    this.ensureOpen();
+
+    const row = this.db.prepare('SELECT * FROM observations WHERE id = ?').get(id);
+    return row ? this.rowToObservation(row) : null;
+  }
+
+  /**
+   * Get observations by IDs (batch)
+   */
+  getObservationsByIds(ids: number[]): Observation[] {
+    this.ensureOpen();
+    if (ids.length === 0) return [];
+
+    const placeholders = ids.map(() => '?').join(',');
+    const rows = this.db
+      .prepare(`SELECT * FROM observations WHERE id IN (${placeholders}) ORDER BY created_at_epoch DESC`)
+      .all(...ids);
+
+    return rows.map((row: any) => this.rowToObservation(row));
+  }
+
+  /**
+   * Get recent observations for a project
+   */
+  getRecentObservations(project?: string, limit: number = 50): Observation[] {
+    this.ensureOpen();
+
+    let sql = 'SELECT * FROM observations';
+    const params: any[] = [];
+
+    if (project) {
+      sql += ' WHERE project = ?';
+      params.push(project);
+    }
+
+    sql += ' ORDER BY created_at_epoch DESC LIMIT ?';
+    params.push(limit);
+
+    const rows = this.db.prepare(sql).all(...params);
+    return rows.map((row: any) => this.rowToObservation(row));
+  }
+
+  /**
+   * Delete observations older than N days
+   */
+  pruneObservations(daysOld: number, project?: string): number {
+    this.ensureOpen();
+
+    const cutoffEpoch = Date.now() - daysOld * 24 * 60 * 60 * 1000;
+    let sql = 'DELETE FROM observations WHERE created_at_epoch < ?';
+    const params: any[] = [cutoffEpoch];
+
+    if (project) {
+      sql += ' AND project = ?';
+      params.push(project);
+    }
+
+    const result = this.db.prepare(sql).run(...params);
+    return result.changes;
+  }
+
+  // ============ Session Summaries ============
+
+  /**
+   * Add a new session summary
+   */
+  addSummary(input: SessionSummaryInput): SessionSummary {
+    this.ensureOpen();
+
+    const now = new Date();
+    const sessionId = input.sessionId || this.generateSessionId();
+    const project = input.project || this.detectProjectName();
+
+    const stmt = this.db.prepare(`
+      INSERT INTO session_summaries (session_id, project, request, investigated, learned, completed, next_steps, files_read, files_edited, created_at, created_at_epoch)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const result = stmt.run(
+      sessionId,
+      project,
+      input.request,
+      input.investigated || '',
+      input.learned || '',
+      input.completed || '',
+      input.nextSteps || '',
+      JSON.stringify(input.filesRead || []),
+      JSON.stringify(input.filesEdited || []),
+      now.toISOString(),
+      now.getTime()
+    );
+
+    return this.getSummaryById(result.lastInsertRowid as number)!;
+  }
+
+  /**
+   * Get summary by ID
+   */
+  getSummaryById(id: number): SessionSummary | null {
+    this.ensureOpen();
+
+    const row = this.db.prepare('SELECT * FROM session_summaries WHERE id = ?').get(id);
+    return row ? this.rowToSummary(row) : null;
+  }
+
+  /**
+   * Get recent summaries for a project
+   */
+  getRecentSummaries(project?: string, limit: number = 20): SessionSummary[] {
+    this.ensureOpen();
+
+    let sql = 'SELECT * FROM session_summaries';
+    const params: any[] = [];
+
+    if (project) {
+      sql += ' WHERE project = ?';
+      params.push(project);
+    }
+
+    sql += ' ORDER BY created_at_epoch DESC LIMIT ?';
+    params.push(limit);
+
+    const rows = this.db.prepare(sql).all(...params);
+    return rows.map((row: any) => this.rowToSummary(row));
+  }
+
+  // ============ Status ============
+
+  /**
+   * Get memory status statistics
+   */
+  getStatus(project?: string): MemoryStatus {
+    this.ensureOpen();
+
+    const projectFilter = project ? ' WHERE project = ?' : '';
+    const params = project ? [project] : [];
+
+    const obsCount = this.db
+      .prepare(`SELECT COUNT(*) as count FROM observations${projectFilter}`)
+      .get(...params)?.count || 0;
+
+    const sumCount = this.db
+      .prepare(`SELECT COUNT(*) as count FROM session_summaries${projectFilter}`)
+      .get(...params)?.count || 0;
+
+    const sessCount = this.db
+      .prepare(`SELECT COUNT(*) as count FROM sessions${projectFilter}`)
+      .get(...params)?.count || 0;
+
+    const oldest = this.db
+      .prepare(`SELECT created_at FROM observations${projectFilter} ORDER BY created_at_epoch ASC LIMIT 1`)
+      .get(...params);
+
+    const newest = this.db
+      .prepare(`SELECT created_at FROM observations${projectFilter} ORDER BY created_at_epoch DESC LIMIT 1`)
+      .get(...params);
+
+    // Top concepts
+    const allObs = this.db
+      .prepare(`SELECT concepts FROM observations${projectFilter}`)
+      .all(...params);
+
+    const conceptCounts: Record<string, number> = {};
+    for (const row of allObs) {
+      try {
+        const concepts = JSON.parse(row.concepts || '[]');
+        for (const c of concepts) {
+          conceptCounts[c] = (conceptCounts[c] || 0) + 1;
+        }
+      } catch { /* skip malformed */ }
+    }
+
+    const topConcepts = Object.entries(conceptCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([concept, count]) => ({ concept, count }));
+
+    // Top files
+    const fileCounts: Record<string, number> = {};
+    for (const row of allObs) {
+      try {
+        const files = JSON.parse(row.files_modified || '[]');
+        for (const f of files) {
+          fileCounts[f] = (fileCounts[f] || 0) + 1;
+        }
+      } catch { /* skip malformed */ }
+    }
+
+    const topFiles = Object.entries(fileCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([file, count]) => ({ file, count }));
+
+    // Estimate total tokens
+    const allNarratives = this.db
+      .prepare(`SELECT narrative FROM observations${projectFilter}`)
+      .all(...params);
+    let totalTokens = 0;
+    for (const row of allNarratives) {
+      totalTokens += estimateTokens(row.narrative);
+    }
+
+    // DB file size
+    let dbSizeBytes = 0;
+    try {
+      const fs = require('fs');
+      const stats = fs.statSync(this.dbPath);
+      dbSizeBytes = stats.size;
+    } catch { /* file might not exist yet */ }
+
+    return {
+      observationCount: obsCount,
+      summaryCount: sumCount,
+      sessionCount: sessCount,
+      oldestObservation: oldest?.created_at || null,
+      newestObservation: newest?.created_at || null,
+      topConcepts,
+      topFiles,
+      estimatedTotalTokens: totalTokens,
+      dbSizeBytes,
+    };
+  }
+
+  // ============ Helpers ============
+
+  private rowToObservation(row: any): Observation {
+    return {
+      id: row.id,
+      sessionId: row.session_id,
+      project: row.project,
+      type: row.type as ObservationType,
+      title: row.title,
+      narrative: row.narrative || '',
+      concepts: this.parseJsonArray(row.concepts),
+      filesRead: this.parseJsonArray(row.files_read),
+      filesModified: this.parseJsonArray(row.files_modified),
+      discoveryTokens: row.discovery_tokens || 0,
+      createdAt: row.created_at,
+      createdAtEpoch: row.created_at_epoch,
+    };
+  }
+
+  private rowToSummary(row: any): SessionSummary {
+    return {
+      id: row.id,
+      sessionId: row.session_id,
+      project: row.project,
+      request: row.request || '',
+      investigated: row.investigated || '',
+      learned: row.learned || '',
+      completed: row.completed || '',
+      nextSteps: row.next_steps || '',
+      filesRead: this.parseJsonArray(row.files_read),
+      filesEdited: this.parseJsonArray(row.files_edited),
+      createdAt: row.created_at,
+      createdAtEpoch: row.created_at_epoch,
+    };
+  }
+
+  private parseJsonArray(json: string | null): string[] {
+    if (!json) return [];
+    try {
+      const parsed = JSON.parse(json);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private generateSessionId(): string {
+    const now = new Date();
+    const random = Math.random().toString(36).substring(2, 8);
+    return `${now.toISOString().replace(/[:.]/g, '-')}-${random}`;
+  }
+
+  private detectProjectName(): string {
+    try {
+      const fs = require('fs');
+      const pkgPath = path.join(process.cwd(), 'package.json');
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+        return pkg.name || path.basename(process.cwd());
+      }
+    } catch { /* ignore */ }
+    return path.basename(process.cwd());
+  }
+}

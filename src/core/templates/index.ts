@@ -23,6 +23,12 @@ Describe your project here.
 ## Tech Stack
 List your technologies here (e.g., PHP 8.1, WordPress 6.0, Laravel 10, etc.)
 
+## Architecture
+Describe the high-level architecture: entry points, module structure, data flow.
+
+## Key Dependencies
+List critical dependencies and their purposes (e.g., better-sqlite3 for memory, commander for CLI).
+
 ## Conventions
 Define coding standards, architectural patterns, and conventions to follow.
 `;
@@ -91,6 +97,8 @@ The following commands are classified by risk level. You **MUST NOT** execute th
 - Tech stack and conventions
 - Existing architecture patterns
 - Coding standards
+
+> **IGNORE backup files**: Files like \\\`project.back1.md\\\`, \\\`project.back2.md\\\`, etc. are automatic backups created during \\\`heraspec init\\\` updates. NEVER read or reference them unless explicitly asked by the user. Only \\\`project.md\\\` is the source of truth.
 
 **Then scaffold:**
 - \`heraspec/changes/<slug>/\` - Create proposal.md, tasks.md, design.md (optional)
@@ -290,6 +298,27 @@ Example with multiple skills in one change:
 \`\`\`
 
 **Key rule**: Switch skill.md when switching task groups!
+
+## Memory-Aware Development (Complementary)
+
+If \\\`heraspec/skills/project-memory/\\\` exists, the agent can optionally use memory to maintain context:
+
+### When to Use Memory
+- **Complex new feature**: Search memory first → \\\`heraspec memory search "feature keywords"\\\`
+- **After significant work**: Log observation → \\\`heraspec memory log --type feature --title "..." --concepts "..."\\\`
+- **End of session**: Summarize → \\\`heraspec memory summarize --request "..." --completed "..."\\\`
+- **Start of complex session**: Read context → \\\`heraspec memory context\\\`
+
+### When to SKIP Memory
+- Simple bug fixes, typo corrections, formatting changes
+- Trivial tasks that take < 5 minutes
+- When doing what the agent's built-in context already covers
+
+### Smart Code Exploration
+If \\\`heraspec/skills/smart-explore/\\\` exists, prefer token-efficient exploration:
+- \\\`heraspec explore outline \u003cfile\u003e\\\` → View structure (~1K tokens vs ~12K full file)
+- \\\`heraspec explore search "\u003cquery\u003e" \u003cpath\u003e\\\` → Find symbols across codebase
+- \\\`heraspec explore unfold \u003cfile\u003e \u003csymbol\u003e\\\` → Read just one function
 `;
   }
 

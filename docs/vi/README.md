@@ -25,6 +25,10 @@ Tài liệu đầy đủ cho HeraSpec bằng tiếng Việt.
 - **[Init Safety Guide](./INIT_SAFETY.md)** - Hướng dẫn an toàn khi chạy `heraspec init` (đang dịch)
 - **[Update Checklist](./UPDATE_CHECKLIST.md)** - Checklist cập nhật tài liệu (đang dịch)
 
+### Bộ Nhớ & Code Intelligence
+
+- **[Hệ Thống Bộ Nhớ (Memory System)](./MEMORY_SYSTEM.md)** - Bộ nhớ dự án bền vững cho AI agents (observations, context, search)
+
 ## Lưu Ý
 
 Một số tài liệu đang trong quá trình dịch. Bạn có thể xem bản tiếng Anh đầy đủ tại [docs/en/](../en/README.md).

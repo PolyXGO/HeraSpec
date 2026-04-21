@@ -21,6 +21,25 @@
       "knowledgePath": "frameworks/php/laravel/botble",
       "files": ["profile.json", "structure.md"],
       "lastUpdated": "2026-04-04"
+    },
+    {
+      "id": "php-codeigniter-rise-cms",
+      "category": "frameworks",
+      "runtime": "php",
+      "framework": "codeigniter",
+      "cms": "rise-cms",
+      "frameworkVersion": "^4.0",
+      "runtimeVersion": "^8.1",
+      "matchSignals": [
+        { "type": "file-contains", "file": "index.php", "contains": "CodeIgniter\\Boot::bootWeb()" },
+        { "type": "file-contains", "file": "app/Config/Rise.php", "contains": "app_version" },
+        { "type": "directory-exists", "path": "plugins" },
+        { "type": "directory-exists", "path": "app/Controllers" }
+      ],
+      "minMatchScore": 3,
+      "knowledgePath": "frameworks/php/codeigniter/rise-cms",
+      "files": ["profile.json", "structure.md"],
+      "lastUpdated": "2026-04-04"
     }
   ]
 }

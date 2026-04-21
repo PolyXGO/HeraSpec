@@ -38,6 +38,71 @@ HeraSpec is a specification-based development framework that helps you:
 >
 > **If you have any suggestions for new skills to supplement HeraSpec, please let me know!** Good luck with love!
 
+<!-- HeraSpec Section -->
+
+<!-- HeraSpec Section -->
+
+<!-- HeraSpec Section -->
+
+<!-- HeraSpec Section -->
+## HeraSpec Development
+
+This project uses [HeraSpec](https://github.com/your-org/heraspec) for spec-driven development.
+
+### Quick Start
+
+```bash
+# Initialize HeraSpec (if not already done)
+heraspec init
+
+# List active changes
+heraspec list
+
+# View a change
+heraspec show <change-name>
+
+# Validate changes
+heraspec validate <change-name>
+```
+
+### Project Structure
+
+- `heraspec/project.md` - Project overview and configuration
+- `heraspec/specs/` - Source of truth specifications
+- `heraspec/changes/` - Active changes in progress
+- `heraspec/skills/` - Reusable skills for AI agents
+- `AGENTS.heraspec.md` - AI agent instructions
+
+### Working with Changes
+
+1. **Create a change**: Ask AI to create a HeraSpec change, or create manually
+2. **Refine specs**: Review and update delta specs in `heraspec/specs/<change-name>/`
+3. **Implement**: Follow tasks in `heraspec/changes/<change-name>/tasks.md`
+4. **Archive**: Run `heraspec archive <change-name> --yes` when complete
+
+### Skills
+
+Add skills to your project:
+
+```bash
+# List available skills
+heraspec skill list
+
+# Add a skill
+heraspec skill add ui-ux
+heraspec skill add unit-test
+
+# View skill details
+heraspec skill show ui-ux
+```
+
+For more information, see the [HeraSpec documentation](https://github.com/your-org/heraspec/docs).
+
+---
+
+*This section is automatically updated by `heraspec init`. Last updated: 2026-04-21*
+
+
 ## Installation
 
 ```bash

@@ -26,6 +26,11 @@ Complete documentation for HeraSpec in English.
 - **[Init Safety Guide](./INIT_SAFETY.md)** - Safety guide for `heraspec init` on existing projects
 - **[Update Checklist](./UPDATE_CHECKLIST.md)** - Checklist for maintaining documentation
 
+### Memory & Code Intelligence
+
+- **[Memory System](./MEMORY_SYSTEM.md)** - Persistent project memory for AI agents (observations, context, search)
+- **[Design System Skill](./DESIGN_SYSTEM_SKILL.md)** - Design system integration
+
 ## Language Options
 
 - [English (current)](./README.md)

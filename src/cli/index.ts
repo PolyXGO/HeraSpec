@@ -17,6 +17,8 @@ import { MakeDocsCommand } from '../commands/make-docs.js';
 import { MakeTestCommand } from '../commands/make-test.js';
 import { MakeCodeCommand } from '../commands/make-code.js';
 import { SuggestCommand } from '../commands/suggest.js';
+import { MemoryCommand } from '../commands/memory.js';
+import { ExploreCommand } from '../commands/explore.js';
 
 const require = createRequire(import.meta.url);
 
@@ -286,6 +288,189 @@ skillCmd
     try {
       const skillCommand = new SkillCommand();
       await skillCommand.update(skillName, options?.projectType, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// Memory commands
+const memoryCmd = program
+  .command('memory')
+  .description('Project memory management (observations, context, search)');
+
+memoryCmd
+  .command('log')
+  .description('Record an observation (decision, bugfix, feature, etc.)')
+  .requiredOption('--type <type>', 'Observation type: decision, bugfix, feature, refactor, discovery, change')
+  .requiredOption('--title <title>', 'Short title for the observation')
+  .option('--narrative <text>', 'Detailed description')
+  .option('--concepts <tags>', 'Comma-separated concept tags')
+  .option('--files-modified <files>', 'Comma-separated file paths modified')
+  .option('--files-read <files>', 'Comma-separated file paths read')
+  .option('--session-id <id>', 'Session identifier')
+  .option('--project <name>', 'Project name')
+  .action(async (options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.log(options, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('search [query]')
+  .description('Search observations using full-text search')
+  .option('--type <type>', 'Filter by observation type')
+  .option('--concepts <tags>', 'Filter by concept tags')
+  .option('--files <files>', 'Filter by file paths')
+  .option('--limit <n>', 'Max results', '20')
+  .option('--id <id>', 'Show full details of a specific observation')
+  .option('--project <name>', 'Filter by project')
+  .action(async (query: string | undefined, options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.search(query || '', { ...options, limit: parseInt(options.limit), id: options.id ? parseInt(options.id) : undefined }, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('context')
+  .description('Generate context markdown for AI agent sessions')
+  .option('--output <mode>', 'Output: stdout (default) or file', 'stdout')
+  .option('--max-tokens <n>', 'Token budget')
+  .action(async (options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.context({ output: options.output, maxTokens: options.maxTokens ? parseInt(options.maxTokens) : undefined }, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('summarize')
+  .description('Create a session summary')
+  .requiredOption('--request <text>', 'What the user asked for')
+  .option('--investigated <text>', 'What was investigated/researched')
+  .option('--learned <text>', 'What was learned')
+  .option('--completed <text>', 'What was completed')
+  .option('--next-steps <text>', 'What remains to be done')
+  .option('--files-read <files>', 'Comma-separated files read')
+  .option('--files-edited <files>', 'Comma-separated files edited')
+  .option('--session-id <id>', 'Session identifier')
+  .option('--project <name>', 'Project name')
+  .action(async (options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.summarize(options, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('status')
+  .description('Show memory statistics')
+  .action(async () => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.status('.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('timeline')
+  .description('Show observation timeline')
+  .option('--limit <n>', 'Max items', '20')
+  .option('--project <name>', 'Filter by project')
+  .action(async (options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.timeline({ limit: parseInt(options.limit), project: options.project }, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('prune <days>')
+  .description('Delete observations older than N days')
+  .option('--project <name>', 'Filter by project')
+  .action(async (days: string, options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.prune(parseInt(days), options, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('optimize')
+  .description('Auto-detect project scale and recommend optimal config')
+  .option('--yes', 'Apply changes without confirmation')
+  .action(async (options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.optimize({ yes: options.yes }, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+// Explore commands
+const exploreCmd = program
+  .command('explore')
+  .description('Smart code exploration (token-efficient)');
+
+exploreCmd
+  .command('outline <file>')
+  .description('Show structural skeleton of a file (functions, classes, exports)')
+  .action(async (filePath: string) => {
+    try {
+      const exploreCommand = new ExploreCommand();
+      await exploreCommand.outline(filePath);
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+exploreCmd
+  .command('search <query> [path]')
+  .description('Search for symbols across the codebase')
+  .option('--limit <n>', 'Max results', '20')
+  .action(async (query: string, searchPath: string | undefined, options: any) => {
+    try {
+      const exploreCommand = new ExploreCommand();
+      await exploreCommand.search(query, searchPath || '.', { limit: parseInt(options.limit) });
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+exploreCmd
+  .command('unfold <file> <symbol>')
+  .description('Show full implementation of a specific symbol')
+  .action(async (filePath: string, symbolName: string) => {
+    try {
+      const exploreCommand = new ExploreCommand();
+      await exploreCommand.unfold(filePath, symbolName);
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);

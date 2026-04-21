@@ -21,6 +21,11 @@ export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
     isCrossCutting: true,
     resourceDirs: ['scripts', 'templates', 'data'],
   },
+  'design-system': {
+    templateFileName: 'design-system-skill.md',
+    isCrossCutting: true,
+    resourceDirs: ['scripts', 'data', 'knowledge/design-systems'],
+  },
   'documents': {
     templateFileName: 'documents-skill.md',
     isCrossCutting: true,
@@ -50,6 +55,14 @@ export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
     templateFileName: 'sourcecode-analyzer-skill.md',
     isCrossCutting: true,
     viFileName: 'sourcecode-analyzer-skill.vi.md',
+  },
+  'project-memory': {
+    templateFileName: 'project-memory-skill.md',
+    isCrossCutting: true,
+  },
+  'smart-explore': {
+    templateFileName: 'smart-explore-skill.md',
+    isCrossCutting: true,
   },
   
   // Perfex module skills

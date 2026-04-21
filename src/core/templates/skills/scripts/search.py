@@ -4,7 +4,7 @@
 UI/UX Builder Search - BM25, Vector, and Hybrid search engine for UI/UX style guides
 Usage: python search.py "<query>" [--domain <domain>] [--stack <stack>] [--mode <mode>] [--max-results 3]
 
-Domains: style, prompt, color, chart, landing, product, ux, typography, pages
+Domains: style, prompt, color, chart, landing, product, ux, typography, pages, design-system
 Stacks: html-tailwind, react, nextjs, vue, svelte, swiftui, react-native, flutter
 Modes: bm25 (default), vector, hybrid
 

@@ -68,6 +68,11 @@ CSV_CONFIG = {
         "file": "pages.csv",
         "search_cols": ["Page Type", "Keywords", "Section Order", "Key Components", "Layout Pattern", "Best For"],
         "output_cols": ["Page Type", "Keywords", "Section Order", "Key Components", "Layout Pattern", "Color Strategy", "Recommended Effects", "Best For", "Considerations"]
+    },
+    "design-system": {
+        "file": "design-systems.csv",
+        "search_cols": ["Brand", "Category", "Keywords", "Design_Philosophy", "Best_For", "Heading_Font", "Shadow_Style"],
+        "output_cols": ["Brand", "Folder", "Category", "Keywords", "Theme", "Primary_Color", "Accent_Color", "Background", "Text_Color", "Heading_Font", "Body_Font", "Mono_Font", "Border_Radius", "Shadow_Style", "Design_Philosophy", "Best_For", "Agent_Quick_Prompt"]
     }
 }
 
@@ -306,7 +311,8 @@ def detect_domain(query):
         "style": ["style", "design", "ui", "minimalism", "glassmorphism", "neumorphism", "brutalism", "dark mode", "flat", "aurora"],
         "ux": ["ux", "usability", "accessibility", "wcag", "touch", "scroll", "animation", "keyboard", "navigation", "mobile"],
         "typography": ["font", "typography", "heading", "serif", "sans"],
-        "pages": ["page", "home", "homepage", "about", "post", "article", "blog", "category", "pricing", "faq", "contact", "product", "shop", "catalog", "details", "single"]
+        "pages": ["page", "home", "homepage", "about", "post", "article", "blog", "category", "pricing", "faq", "contact", "product", "shop", "catalog", "details", "single"],
+        "design-system": ["design system", "brand", "stripe", "vercel", "linear", "supabase", "notion", "figma", "airbnb", "spotify", "apple", "inspired", "like", "style of", "look of", "design-md", "design.md"]
     }
 
     scores = {domain: sum(1 for kw in keywords if kw in query_lower) for domain, keywords in domain_keywords.items()}

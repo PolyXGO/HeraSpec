@@ -92,7 +92,16 @@ Use `scripts/search.py` multiple times to gather comprehensive information. Sear
    python3 scripts/search.py "accessibility" --domain ux
    ```
 
-8. **Stack** - Get stack-specific guidelines (default: html-tailwind)
+8. **Design System** - Get real-world brand design references (54 brands: Stripe, Vercel, Linear, etc.)
+   ```bash
+   # Search by brand name
+   python3 scripts/search.py "stripe" --domain design-system
+   # Search by style/industry
+   python3 scripts/search.py "dark developer tools" --domain design-system --mode hybrid
+   # Then read the full DESIGN.md from knowledge/design-systems/<folder>/DESIGN.md
+   ```
+
+9. **Stack** - Get stack-specific guidelines (default: html-tailwind)
    ```bash
    python3 scripts/search.py "<keyword>" --stack html-tailwind
    # Or with semantic search:
@@ -182,6 +191,7 @@ Before delivering UI code, verify:
 | `chart` | Chart types, library recommendations | trend, comparison, timeline, funnel, pie |
 | `ux` | Best practices, anti-patterns | animation, accessibility, z-index, loading |
 | `prompt` | AI prompts, CSS keywords | (style name) |
+| `design-system` | Real-world brand design systems (54 brands) | stripe, vercel, linear, dark developer, fintech premium |
 
 ### Available Stacks
 
@@ -582,3 +592,4 @@ python3 scripts/search.py "how to make layout responsive" --stack html-tailwind 
 
 - **documents**: Use to document design system
 - **content-optimization**: Use to optimize CTA placement and styling
+- **design-system**: Use for real-world brand design references (Stripe, Vercel, Linear, etc.)
