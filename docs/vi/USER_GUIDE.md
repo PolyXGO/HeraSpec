@@ -15,6 +15,7 @@ Hướng dẫn chi tiết về cách sử dụng HeraSpec - framework phát tri�
 9. [Định Dạng Tasks](#định-dạng-tasks)
 10. [Ví Dụ Thực Tế](#ví-dụ-thực-tế)
 11. [Tích Hợp AI](#tích-hợp-ai)
+12. [Hệ Thống Memory](#hệ-thống-memory)
 
 ## Tổng Quan
 
@@ -252,6 +253,7 @@ Lệnh này sẽ:
 - Merge delta specs vào source specs
 - Di chuyển change folder vào `archives/` với prefix ngày tháng
 - Cập nhật source of truth specs
+- **Tự động lưu Memory**: Trích xuất nội dung `proposal.md` và ghi nhận thành một Observation trong Memory DB, đồng thời tự động tối ưu hóa cấu hình bộ nhớ.
 
 ### 6. Tạo Tài Liệu Sản Phẩm (Generate Documentation)
 
@@ -1259,6 +1261,18 @@ heraspec validate <change-name>
 - [ARCHITECTURE.md](ARCHITECTURE.md) - Kiến trúc kỹ thuật
 - [PROJECT_TYPES_AND_SKILLS.md](PROJECT_TYPES_AND_SKILLS.md) - Danh sách project types và skills
 - [UPDATE_CHECKLIST.md](UPDATE_CHECKLIST.md) - Checklist khi cập nhật HeraSpec source code
+- [MEMORY_SYSTEM.md](MEMORY_SYSTEM.md) - Tài liệu chi tiết về Memory System
+
+## Hệ Thống Memory
+
+HeraSpec cung cấp Hệ Thống Memory (Bộ nhớ dự án) để duy trì ngữ cảnh cho AI Agents qua nhiều phiên làm việc.
+
+Tính năng nổi bật:
+- **Tự động Index**: Khi chạy `heraspec init`, hệ thống tự động quét và lưu lại bản đồ kiến trúc của dự án.
+- **Tối Ưu Token**: Lưu trữ quan sát (observations) để tiết kiệm token khi truy vấn ngữ cảnh dự án.
+- **Tính Toán Chi Phí Thực Tế**: Cờ `--discovery-tokens` cho phép theo dõi chính xác lượng Token tiết kiệm được.
+
+Tham khảo đầy đủ tại: [MEMORY_SYSTEM.md](MEMORY_SYSTEM.md)
 
 ## Hỗ Trợ
 

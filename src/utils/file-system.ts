@@ -87,4 +87,67 @@ export class FileSystemUtils {
   static getBaseName(filePath: string): string {
     return path.basename(filePath);
   }
+
+  static async generateTree(
+    dirPath: string,
+    maxDepth: number = 3,
+    ignoreDirs: string[] = ['node_modules', '.git', 'dist', 'build', 'vendor', '.next', '.nuxt', 'heraspec', '.heraspec'],
+    currentDepth: number = 0,
+    prefix: string = ''
+  ): Promise<string> {
+    if (currentDepth >= maxDepth) return '';
+
+    let result = '';
+    let entries: string[];
+    try {
+      entries = await fs.readdir(dirPath);
+    } catch {
+      return result;
+    }
+
+    const validEntries = [];
+    for (const entry of entries) {
+      if (ignoreDirs.includes(entry)) continue;
+      // Skip hidden folders to keep tree clean
+      if (entry.startsWith('.')) {
+        const stat = await this.stat(path.join(dirPath, entry)).catch(() => null);
+        if (stat?.isDirectory()) continue;
+      }
+      validEntries.push(entry);
+    }
+
+    // Sort: directories first, then files
+    const statsCache = new Map<string, any>();
+    for (const entry of validEntries) {
+      const stat = await this.stat(path.join(dirPath, entry)).catch(() => null);
+      statsCache.set(entry, stat);
+    }
+
+    validEntries.sort((a, b) => {
+      const statA = statsCache.get(a);
+      const statB = statsCache.get(b);
+      if (statA?.isDirectory() && !statB?.isDirectory()) return -1;
+      if (!statA?.isDirectory() && statB?.isDirectory()) return 1;
+      return a.localeCompare(b);
+    });
+
+    for (let i = 0; i < validEntries.length; i++) {
+      const entry = validEntries[i];
+      const isLast = i === validEntries.length - 1;
+      const marker = isLast ? '└── ' : '├── ';
+      const childPrefix = prefix + (isLast ? '    ' : '│   ');
+
+      const entryPath = path.join(dirPath, entry);
+      const stat = statsCache.get(entry);
+
+      if (stat?.isDirectory()) {
+        result += `${prefix}${marker}${entry}/\n`;
+        result += await this.generateTree(entryPath, maxDepth, ignoreDirs, currentDepth + 1, childPrefix);
+      } else {
+        result += `${prefix}${marker}${entry}\n`;
+      }
+    }
+
+    return result;
+  }
 }

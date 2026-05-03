@@ -47,15 +47,23 @@ heraspec skill add smart-explore   # Optional: token-efficient code exploration
 
 ### 2. Core Commands
 
+#### Architecture Map (Index)
+```bash
+heraspec memory index           # Scan project and generate architecture map
+heraspec memory index --depth 2 # Limit scanning depth
+```
+*Note: This command runs automatically in the background when you run `heraspec init`.*
+
 #### Record an Observation
 ```bash
 heraspec memory log \
-  --type feature \
-  --title "Added user authentication" \
-  --narrative "Implemented JWT-based auth with refresh tokens" \
-  --concepts "auth,jwt,security" \
-  --files-modified "src/auth/middleware.ts,src/auth/jwt.ts"
+  --type bugfix \
+  --title "Fix auth middleware" \
+  --discovery-tokens 15000 \
+  --narrative "Implemented JWT-based auth with refresh tokens..."
+
 ```
+> **Auto-Log Note:** You DO NOT NEED to call this command manually if you use the standard workflow. When you run `heraspec archive <change-name>`, the system automatically reads your `proposal.md` and executes this log command under the hood! The `--discovery-tokens` flag will be set automatically to calculate token savings.
 
 #### Search Memory
 ```bash
@@ -69,18 +77,11 @@ heraspec memory search --id 42   # Full details of observation #42
 heraspec memory context                 # Print to stdout
 heraspec memory context --output file   # Write to heraspec/memory/context.md
 ```
+*Note: `heraspec memory context` automatically pins the latest Architecture Map observation to the very top of the generated file.*
 
-#### Summarize Session
+#### Analytics & Status
 ```bash
-heraspec memory summarize \
-  --request "Implement user login flow" \
-  --completed "JWT auth, login/logout endpoints, middleware" \
-  --learned "bcrypt rounds should be 12+ for production" \
-  --next-steps "Add password reset, OAuth providers"
-```
-
-#### View Status & Timeline
-```bash
+heraspec memory analytics  # View precise Token Economics and savings
 heraspec memory status     # Statistics + auto-detect recommendations
 heraspec memory timeline   # Chronological view
 ```

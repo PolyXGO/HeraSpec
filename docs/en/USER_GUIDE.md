@@ -15,6 +15,7 @@ Detailed guide on how to use HeraSpec - a spec-based development framework for a
 9. [Tasks Format](#tasks-format)
 10. [Real-World Examples](#real-world-examples)
 11. [AI Integration](#ai-integration)
+12. [Memory System](#memory-system)
 
 ## Overview
 
@@ -252,6 +253,7 @@ This command will:
 - Merge delta specs into source specs
 - Move change folder to `archives/` with date prefix
 - Update source of truth specs
+- **Auto-Log Memory**: Automatically extract the content of `proposal.md` and log it as an Observation in the Memory DB, while silently optimizing the memory configuration.
 
 ### 6. Generate Product Documentation
 
@@ -1317,6 +1319,18 @@ heraspec validate <change-name>
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Technical architecture
 - [PROJECT_TYPES_AND_SKILLS.md](./PROJECT_TYPES_AND_SKILLS.md) - List of project types and skills
 - [UPDATE_CHECKLIST.md](./UPDATE_CHECKLIST.md) - Checklist when updating HeraSpec source code
+- [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md) - Detailed documentation on the Memory System
+
+## Memory System
+
+HeraSpec provides a Memory System (Project Memory) to maintain context for AI Agents across multiple working sessions.
+
+Key features:
+- **Auto Indexing**: When running `heraspec init`, the system automatically scans and saves the project's architecture map.
+- **Token Optimization**: Stores observations to save tokens when querying project context.
+- **Precise Cost Calculation**: The `--discovery-tokens` flag allows tracking the exact amount of Tokens saved.
+
+For full details, see: [MEMORY_SYSTEM.md](./MEMORY_SYSTEM.md)
 
 ## Support
 

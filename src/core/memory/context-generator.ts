@@ -33,7 +33,22 @@ export class ContextGenerator {
         return this.renderEmptyState();
       }
 
-      return this.buildContextOutput(observations, summaries, config);
+      let architectureObs: Observation | null = null;
+      try {
+        const db = (this.store as any).getDb();
+        const row = db.prepare(`SELECT id FROM observations WHERE type = 'discovery' AND concepts LIKE '%"architecture"%' ORDER BY created_at_epoch DESC LIMIT 1`).get();
+        if (row) {
+          architectureObs = this.store.getObservationById(row.id);
+        }
+      } catch (e) { }
+
+      // Filter out ALL architecture observations from recent activity to avoid clutter
+      // if the user ran 'heraspec memory index' multiple times.
+      const filteredObservations = observations.filter(o => 
+        !(o.type === 'discovery' && o.concepts.includes('architecture'))
+      );
+
+      return this.buildContextOutput(filteredObservations, summaries, config, architectureObs);
     } finally {
       this.store.close();
     }
@@ -75,7 +90,8 @@ export class ContextGenerator {
   private buildContextOutput(
     observations: Observation[],
     summaries: SessionSummary[],
-    config: ContextConfig
+    config: ContextConfig,
+    architectureObs: Observation | null = null
   ): string {
     const lines: string[] = [];
     let tokenBudget = config.maxTokens;
@@ -87,6 +103,21 @@ export class ContextGenerator {
     lines.push(`> Generated: ${new Date().toISOString()}`);
     lines.push('');
     tokenBudget -= 30; // header tokens
+
+    // Architecture Map (Pinned at the top if exists)
+    if (architectureObs) {
+      lines.push('## Project Architecture');
+      lines.push('');
+      const archBlock = this.renderFullObservation(architectureObs);
+      const archTokens = estimateTokens(archBlock);
+      
+      if (tokenBudget >= archTokens) {
+        lines.push(archBlock);
+        tokenBudget -= archTokens;
+      } else {
+        lines.push(`> Architecture map is too large to include. Use \`heraspec memory search --id ${architectureObs.id}\` to view it.\n`);
+      }
+    }
 
     // Most recent session summary
     if (config.showLastSummary && summaries.length > 0) {

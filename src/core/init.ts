@@ -92,11 +92,23 @@ export class InitCommand {
       // Update related markdown files (README.md, etc.)
       await this.updateRelatedMarkdownFiles(resolvedPath);
 
-      spinner.succeed(
+      spinner.stop();
+
+      // Automate Memory Indexing and Context Generation
+      try {
+        const memoryCommand = new MemoryCommand();
+        await memoryCommand.index({ depth: "3", yes: true }, resolvedPath);
+        await memoryCommand.context({ output: 'file' }, resolvedPath);
+      } catch (err) {
+        // Silently continue if something goes wrong
+      }
+
+      console.log();
+      console.log(
         chalk.green(
           alreadyInitialized
-            ? 'HeraSpec updated successfully'
-            : 'HeraSpec initialized successfully'
+            ? '✔ HeraSpec updated successfully'
+            : '✔ HeraSpec initialized successfully'
         )
       );
 
@@ -356,6 +368,28 @@ export class InitCommand {
       updatedContent = this.replaceSkillsSection(existingContent, latestSkillsSection);
     } else {
       updatedContent = this.appendSkillsSection(existingContent, latestSkillsSection);
+    }
+
+    // Update Memory section
+    const oldMemoryMarker = '## Memory-Aware Development';
+    const newMemoryMarker = '## Proactive Memory-Aware Development';
+    
+    // Extract new memory section from fullTemplate
+    const memoryStartIndex = fullTemplate.indexOf(newMemoryMarker);
+    if (memoryStartIndex !== -1) {
+      let memoryEndIndex = fullTemplate.indexOf('\n## ', memoryStartIndex + newMemoryMarker.length);
+      if (memoryEndIndex === -1) memoryEndIndex = fullTemplate.length;
+      
+      const memorySection = fullTemplate.substring(memoryStartIndex, memoryEndIndex).trim();
+
+      if (updatedContent.includes(oldMemoryMarker)) {
+        updatedContent = this.replaceSection(updatedContent, oldMemoryMarker, memorySection);
+      } else if (updatedContent.includes(newMemoryMarker)) {
+        updatedContent = this.replaceSection(updatedContent, newMemoryMarker, memorySection);
+      } else {
+        // Append at the end
+        updatedContent = updatedContent.trimEnd() + '\n\n' + memorySection;
+      }
     }
     
     if (updatedContent !== existingContent) {

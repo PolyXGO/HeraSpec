@@ -82,6 +82,10 @@ export class ArchiveCommand {
       await FileSystemUtils.removeDirectory(changePath, true);
 
       spinner.succeed(chalk.green(`Change "${changeName}" archived successfully`));
+
+      // 6. Auto-log to memory
+      await this.autoLogToMemory(changeName, archivePath);
+
     } catch (error) {
       spinner.fail(chalk.red(`Error: ${(error as Error).message}`));
       throw error;
@@ -203,6 +207,58 @@ export class ArchiveCommand {
     }
 
     return specs;
+  }
+  private async autoLogToMemory(changeName: string, archivePath: string): Promise<void> {
+    try {
+      // Check if memory is enabled/initialized
+      const memoryDbPath = path.join('.', HERASPEC_DIR_NAME, 'memory', 'heraspec-memory.db');
+      if (!(await FileSystemUtils.fileExists(memoryDbPath))) {
+        // Memory system not initialized, skip auto-logging silently
+        return;
+      }
+
+      // Dynamically import MemoryCommand to avoid circular dependencies if any
+      const { MemoryCommand } = await import('../commands/memory.js');
+      const memoryCmd = new MemoryCommand();
+
+      // Read proposal content if exists
+      let narrative = '';
+      const proposalPath = path.join(archivePath, 'proposal.md');
+      if (await FileSystemUtils.fileExists(proposalPath)) {
+        narrative = await FileSystemUtils.readFile(proposalPath);
+      }
+
+      // Also grab tasks if available
+      const tasksPath = path.join(archivePath, 'tasks.md');
+      if (await FileSystemUtils.fileExists(tasksPath)) {
+        const tasksContent = await FileSystemUtils.readFile(tasksPath);
+        if (narrative) narrative += '\n\n---\n\n';
+        narrative += tasksContent;
+      }
+
+      // Truncate narrative if too long to prevent token blowout
+      const MAX_LENGTH = 10000;
+      if (narrative.length > MAX_LENGTH) {
+        narrative = narrative.substring(0, MAX_LENGTH) + '\n...[truncated]';
+      }
+
+      // We call log silently by capturing console.log temporarily or we can just call it
+      // Wait, memoryCmd.log calls spinner.succeed and console.log, which is fine since we want to inform the user
+      // But maybe we don't want spinner if we just succeeded. The log method uses its own spinner.
+      
+      // Call memoryCmd.log
+      await memoryCmd.log({
+        type: 'feature',
+        title: `Archived change: ${changeName}`,
+        narrative: narrative || `Auto-archived change: ${changeName}`,
+        // We could theoretically set discoveryTokens here, but auto-log uses 0.
+        discoveryTokens: '0'
+      }, '.');
+
+    } catch (error) {
+      // Silently fail if something goes wrong with memory auto-logging
+      // We don't want to break the archive process
+    }
   }
 }
 

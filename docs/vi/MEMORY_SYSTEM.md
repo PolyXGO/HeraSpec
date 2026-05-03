@@ -26,15 +26,23 @@ heraspec skill add smart-explore   # Tùy chọn: khám phá code hiệu quả
 
 ### 2. Các Lệnh Chính
 
+#### Bản Đồ Kiến Trúc (Architecture Index)
+```bash
+heraspec memory index           # Quét thư mục và tạo bản đồ kiến trúc
+heraspec memory index --depth 2 # Quét với độ sâu giới hạn
+```
+*Lưu ý: Lệnh này được chạy tự động ngầm khi bạn gõ `heraspec init`.*
+
 #### Ghi Nhận Quan Sát (Observation)
 ```bash
 heraspec memory log \
-  --type feature \
-  --title "Thêm xác thực người dùng" \
-  --narrative "Triển khai JWT auth với refresh tokens" \
-  --concepts "auth,jwt,security" \
-  --files-modified "src/auth/middleware.ts,src/auth/jwt.ts"
+  --type bugfix \
+  --title "Fix auth middleware" \
+  --discovery-tokens 15000 \
+  --narrative "Triển khai JWT auth với refresh tokens..."
+
 ```
+> **Lưu ý Tự Động (Auto-Log):** Bạn KHÔNG CẦN gọi lệnh này thủ công nếu bạn dùng quy trình chuẩn. Khi bạn chạy lệnh `heraspec archive <change-name>`, hệ thống sẽ tự động đọc `proposal.md` và thực thi lệnh log ngầm bên dưới! Cờ `--discovery-tokens` sẽ được thiết lập tự động để tính toán độ tiết kiệm.
 
 #### Tìm Kiếm Memory
 ```bash
@@ -48,19 +56,12 @@ heraspec memory search --id 42   # Chi tiết đầy đủ observation #42
 heraspec memory context                 # In ra stdout
 heraspec memory context --output file   # Ghi vào heraspec/memory/context.md
 ```
+*Lưu ý: Lệnh `heraspec memory context` sẽ tự động ghim Bản Đồ Kiến Trúc (Architecture Map) lên đầu file nếu có.*
 
-#### Tóm Tắt Phiên Làm Việc
+#### Thống Kê & Phân Tích (Analytics)
 ```bash
-heraspec memory summarize \
-  --request "Triển khai luồng đăng nhập" \
-  --completed "JWT auth, login/logout endpoints, middleware" \
-  --learned "bcrypt rounds nên >= 12 cho production" \
-  --next-steps "Thêm reset password, OAuth providers"
-```
-
-#### Trạng Thái & Timeline
-```bash
-heraspec memory status     # Thống kê + tự động đề xuất config
+heraspec memory analytics  # Thống kê số lượng Token thực tế tiết kiệm được
+heraspec memory status     # Trạng thái DB
 heraspec memory timeline   # Xem theo thời gian
 ```
 

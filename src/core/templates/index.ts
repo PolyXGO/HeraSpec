@@ -299,15 +299,14 @@ Example with multiple skills in one change:
 
 **Key rule**: Switch skill.md when switching task groups!
 
-## Memory-Aware Development (Complementary)
+## Proactive Memory-Aware Development
 
-If \\\`heraspec/skills/project-memory/\\\` exists, the agent can optionally use memory to maintain context:
+If \\\`heraspec/skills/project-memory/\\\` exists, the agent MUST proactively use memory to maintain project context. DO NOT wait for the user to prompt you to use memory.
 
-### When to Use Memory
-- **Complex new feature**: Search memory first → \\\`heraspec memory search "feature keywords"\\\`
-- **After significant work**: Log observation → \\\`heraspec memory log --type feature --title "..." --concepts "..."\\\`
-- **End of session**: Summarize → \\\`heraspec memory summarize --request "..." --completed "..."\\\`
-- **Start of complex session**: Read context → \\\`heraspec memory context\\\`
+### CRITICAL RULES FOR AUTOMATIC MEMORY USAGE
+1. **Always Check Context First**: At the beginning of a complex task or when encountering an unfamiliar codebase area, you MUST autonomously run \\\`heraspec memory context\\\` or \\\`heraspec memory search "keywords"\\\` BEFORE writing any code.
+2. **Auto-Log via Archive**: You DO NOT need to run \\\`heraspec memory log\\\` manually. Every time you successfully implement a feature and run \\\`heraspec archive <change-name>\\\`, the system will automatically read your proposal and log the memory observation under the hood. Just use \\\`heraspec archive\\\` as normal!
+3. **Session Summary**: (Optional) When wrapping up a large session, you can run \\\`heraspec memory summarize --request "..." --completed "..."\\\` to compress knowledge, though \\\`archive\\\` already auto-logs completed features.
 
 ### When to SKIP Memory
 - Simple bug fixes, typo corrections, formatting changes

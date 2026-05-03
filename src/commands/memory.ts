@@ -26,6 +26,7 @@ export class MemoryCommand {
     concepts?: string;
     filesModified?: string;
     filesRead?: string;
+    discoveryTokens?: string;
     sessionId?: string;
     project?: string;
   }, projectPath: string = '.'): Promise<void> {
@@ -50,6 +51,7 @@ export class MemoryCommand {
           concepts: options.concepts ? options.concepts.split(',').map(c => c.trim()) : [],
           filesModified: options.filesModified ? options.filesModified.split(',').map(f => f.trim()) : [],
           filesRead: options.filesRead ? options.filesRead.split(',').map(f => f.trim()) : [],
+          discoveryTokens: options.discoveryTokens ? parseInt(options.discoveryTokens, 10) : 0,
           sessionId: options.sessionId,
           project: options.project,
         });
@@ -69,6 +71,13 @@ export class MemoryCommand {
     } catch (error) {
       spinner.fail(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       process.exitCode = 1;
+    }
+
+    // Auto-optimize memory config silently
+    try {
+      await this.optimize({ yes: true, silent: true }, projectPath);
+    } catch (e) {
+      // Ignore auto-optimize errors
     }
   }
 
@@ -203,6 +212,13 @@ export class MemoryCommand {
     } catch (error) {
       spinner.fail(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
       process.exitCode = 1;
+    }
+
+    // Auto-optimize memory config silently
+    try {
+      await this.optimize({ yes: true, silent: true }, projectPath);
+    } catch (e) {
+      // Ignore auto-optimize errors
     }
   }
 
@@ -342,7 +358,7 @@ export class MemoryCommand {
   /**
    * heraspec memory optimize - Auto-detect and apply optimal config
    */
-  async optimize(options: { yes?: boolean } = {}, projectPath: string = '.'): Promise<void> {
+  async optimize(options: { yes?: boolean; silent?: boolean } = {}, projectPath: string = '.'): Promise<void> {
     try {
       const store = new MemoryStore(projectPath);
       store.open();
@@ -358,16 +374,28 @@ export class MemoryCommand {
           enterprise: '🏗️ Enterprise (2000+ observations)',
         };
 
-        console.log(`\n🔍 HeraSpec Memory Config Optimizer\n`);
-        console.log(`Project scale: ${scaleLabels[advice.projectScale]}`);
-        console.log(`Observations: ${status.observationCount} | Summaries: ${status.summaryCount}\n`);
+        if (!options.silent) {
+          console.log(`\n🔍 HeraSpec Memory Config Optimizer\n`);
+          console.log(`Project scale: ${scaleLabels[advice.projectScale]}`);
+          console.log(`Observations: ${status.observationCount} | Summaries: ${status.summaryCount}\n`);
+        }
 
         if (!advice.hasChanges) {
-          console.log(chalk.green('✅ Current config is already optimal for your project scale.\n'));
+          if (!options.silent) {
+            console.log(chalk.green('✅ Current config is already optimal for your project scale.\n'));
+          }
           return;
         }
 
-        console.log('Proposed changes:\n');
+        if (options.silent && options.yes) {
+          // In silent mode, just apply and return
+          saveContextConfig(newConfig, projectPath);
+          return;
+        }
+
+        if (!options.silent) {
+          console.log('Proposed changes:\n');
+        }
         console.log('  ┌─────────────────────────┬──────────┬─────────────┐');
         console.log('  │ Setting                 │ Current  │ Recommended │');
         console.log('  ├─────────────────────────┼──────────┼─────────────┤');
@@ -671,6 +699,59 @@ export class MemoryCommand {
       }
     } catch (error) {
       console.error(chalk.red(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      process.exitCode = 1;
+    }
+  }
+
+  /**
+   * heraspec memory index - Scan project and generate architecture map observation
+   */
+  async index(options: { depth?: string, yes?: boolean } = {}, projectPath: string = '.'): Promise<void> {
+    console.log(chalk.cyan('\n🔍 Generating Project Architecture Index...\n'));
+    
+    if (!options.yes) {
+      const { confirm } = await import('@inquirer/prompts');
+      const answer = await confirm({
+        message: 'This will scan the project directory structure and add an Architecture Map to the Memory DB. Proceed?',
+        default: true,
+      });
+      if (!answer) {
+        console.log(chalk.gray('Aborted.'));
+        return;
+      }
+    }
+
+    const spinner = ora('Scanning project structure...').start();
+    try {
+      const maxDepth = options.depth ? parseInt(options.depth, 10) : 3;
+      
+      const treeStr = await FileSystemUtils.generateTree(projectPath, maxDepth);
+      
+      if (!treeStr) {
+        spinner.fail('Failed to generate tree or directory is empty.');
+        process.exitCode = 1;
+        return;
+      }
+
+      const narrative = `### Project Directory Structure (Depth: ${maxDepth})\n\n\`\`\`text\n${treeStr}\n\`\`\`\n\n> This observation provides a structural overview of the project. For deeper insights into specific files, use \`heraspec explore outline <file>\`.`;
+
+      const store = new MemoryStore(projectPath);
+      store.open();
+      try {
+        const obs = store.addObservation({
+          type: 'discovery',
+          title: 'Project Architecture and Directory Structure',
+          narrative: narrative,
+          concepts: ['architecture', 'structure', 'index'],
+        });
+
+        spinner.succeed(`Architecture Map saved to Memory DB as Observation #${obs.id}.`);
+        console.log(chalk.gray(`\nUse ${chalk.cyan('heraspec memory context')} to see the updated context map.`));
+      } finally {
+        store.close();
+      }
+    } catch (error) {
+      spinner.fail(`Indexing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       process.exitCode = 1;
     }
   }

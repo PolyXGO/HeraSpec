@@ -14,7 +14,8 @@ This directory contains documentation for HeraSpec in multiple languages.
 
 ### English Documentation
 
-- [User Guide](./en/README.md)
+- [User Guide](./en/USER_GUIDE.md)
+- [Memory System](./en/MEMORY_SYSTEM.md)
 - [Development Setup](./en/DEVELOPMENT_SETUP.md)
 - [Architecture](./en/ARCHITECTURE.md)
 - [Skills System](./en/SKILLS_SYSTEM.md)
@@ -23,6 +24,7 @@ This directory contains documentation for HeraSpec in multiple languages.
 ### Vietnamese Documentation (Tiếng Việt)
 
 - [Hướng Dẫn Sử Dụng](./vi/USER_GUIDE.md)
+- [Hệ Thống Memory](./vi/MEMORY_SYSTEM.md)
 - [Hệ Thống Skills](./vi/SKILLS_SYSTEM.md)
 - [Kiến Trúc](./vi/ARCHITECTURE.md)
 - [Thiết Lập Môi Trường](./vi/DEVELOPMENT_SETUP.md)

@@ -308,6 +308,7 @@ memoryCmd
   .option('--concepts <tags>', 'Comma-separated concept tags')
   .option('--files-modified <files>', 'Comma-separated file paths modified')
   .option('--files-read <files>', 'Comma-separated file paths read')
+  .option('--discovery-tokens <n>', 'Estimated tokens spent exploring/searching before logging this observation')
   .option('--session-id <id>', 'Session identifier')
   .option('--project <name>', 'Project name')
   .action(async (options: any) => {
@@ -454,6 +455,21 @@ memoryCmd
     try {
       const memoryCommand = new MemoryCommand();
       await memoryCommand.analytics({ history: options.history }, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('index')
+  .description('Scan project and generate architecture map observation')
+  .option('--depth <n>', 'Maximum directory depth to scan (default: 3)')
+  .option('--yes', 'Apply changes without confirmation')
+  .action(async (options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.index({ depth: options.depth, yes: options.yes }, '.');
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);
