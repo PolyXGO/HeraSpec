@@ -1,0 +1,51 @@
+{
+  "id": "php-wordpress-core",
+  "name": "WordPress CMS",
+  "runtime": "php",
+  "runtimeVersion": ">=7.2.24",
+  "framework": "wordpress",
+  "frameworkVersion": "^6.0",
+  "cms": "wordpress",
+  "cmsType": "monolith-with-plugin-theme-extensions",
+  "description": "Open-source CMS built on PHP with a hook-based plugin/theme architecture, REST API, Block Editor (Gutenberg), and global function procedural style. Powers ~43% of the web.",
+  "keyFeatures": [
+    "Hook/Filter system (add_action, add_filter, do_action, apply_filters) — core extensibility",
+    "Plugin architecture via wp-content/plugins/",
+    "Theme architecture via wp-content/themes/ with template hierarchy",
+    "Block Editor (Gutenberg) with block.json registration",
+    "REST API with /wp-json/wp/v2/ endpoints and custom endpoint registration",
+    "WP_Query — the main content query engine",
+    "Custom Post Types and Custom Taxonomies",
+    "User roles and capabilities system (WP_Roles, WP_User)",
+    "Widget system (WP_Widget, WP_Widget_Factory)",
+    "Shortcode API",
+    "WP-Cron scheduling system",
+    "Multisite network support",
+    "Customizer API (WP_Customize_Manager)",
+    "Options API (get_option, update_option) for persistent key-value storage",
+    "Transients API for cached key-value storage with expiration",
+    "Rewrite API for pretty permalinks",
+    "Script/Style dependency management (wp_enqueue_script, wp_enqueue_style)",
+    "Interactivity API for interactive front-end blocks",
+    "Full Site Editing (FSE) with theme.json and block templates",
+    "XML-RPC and Application Passwords for remote authentication"
+  ],
+  "directorySignature": [
+    "wp-content",
+    "wp-admin",
+    "wp-includes"
+  ],
+  "fileSignature": [
+    "wp-config.php",
+    "wp-settings.php",
+    "wp-load.php",
+    "wp-blog-header.php"
+  ],
+  "typicalPlugins": [
+    "woocommerce", "contact-form-7", "yoast-seo", "elementor",
+    "advanced-custom-fields", "wordfence", "jetpack",
+    "wp-super-cache", "akismet", "classic-editor"
+  ],
+  "analysisFile": "structure.md",
+  "lastUpdated": "2026-05-03"
+}
