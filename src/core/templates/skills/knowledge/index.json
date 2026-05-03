@@ -40,6 +40,26 @@
       "knowledgePath": "frameworks/php/codeigniter/rise-cms",
       "files": ["profile.json", "structure.md"],
       "lastUpdated": "2026-04-04"
+    },
+    {
+      "id": "php-wordpress-core",
+      "category": "frameworks",
+      "runtime": "php",
+      "framework": "wordpress",
+      "cms": "wordpress",
+      "frameworkVersion": "^6.0",
+      "runtimeVersion": ">=7.2.24",
+      "matchSignals": [
+        { "type": "file-contains", "file": "wp-includes/version.php", "contains": "$wp_version" },
+        { "type": "file-contains", "file": "wp-config.php", "contains": "DB_NAME" },
+        { "type": "directory-exists", "path": "wp-content" },
+        { "type": "directory-exists", "path": "wp-includes" },
+        { "type": "directory-exists", "path": "wp-admin" }
+      ],
+      "minMatchScore": 3,
+      "knowledgePath": "frameworks/php/wordpress/core",
+      "files": ["profile.json", "structure.md"],
+      "lastUpdated": "2026-05-03"
     }
   ]
 }
