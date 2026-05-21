@@ -184,143 +184,14 @@ The following commands are classified by risk level. You **MUST NOT** execute th
 - This merges delta specs into source specs
 - Moves change folder to archives
 
-## Spec Format
-
-Specs must include:
-- `## Meta` section with project type, domain, stack
-- `## Purpose`
-- `## Requirements` with scenarios
-
-## Delta Spec Format
-
-Delta specs use:
-- `## ADDED Requirements`
-- `## MODIFIED Requirements`
-- `## REMOVED Requirements`
-
-## Tasks Format
-
-Tasks grouped by project type and skill:
-```
-## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
-- [ ] Task description
-```
-
-
-## Spec Format
-
-Specs must include:
-- `## Meta` section with project type, domain, stack
-- `## Purpose`
-- `## Requirements` with scenarios
-
-## Delta Spec Format
-
-Delta specs use:
-- `## ADDED Requirements`
-- `## MODIFIED Requirements`
-- `## REMOVED Requirements`
-
-## Tasks Format
-
-Tasks grouped by project type and skill:
-```
-## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
-- [ ] Task description
-```
-
-
-## Spec Format
-
-Specs must include:
-- `## Meta` section with project type, domain, stack
-- `## Purpose`
-- `## Requirements` with scenarios
-
-## Delta Spec Format
-
-Delta specs use:
-- `## ADDED Requirements`
-- `## MODIFIED Requirements`
-- `## REMOVED Requirements`
-
-## Tasks Format
-
-Tasks grouped by project type and skill:
-```
-## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
-- [ ] Task description
-```
-
-
-## Spec Format
-
-Specs must include:
-- `## Meta` section with project type, domain, stack
-- `## Purpose`
-- `## Requirements` with scenarios
-
-## Delta Spec Format
-
-Delta specs use:
-- `## ADDED Requirements`
-- `## MODIFIED Requirements`
-- `## REMOVED Requirements`
-
-## Tasks Format
-
-Tasks grouped by project type and skill:
-```
-## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
-- [ ] Task description
-```
-
-
-## Spec Format
-
-Specs must include:
-- `## Meta` section with project type, domain, stack
-- `## Purpose`
-- `## Requirements` with scenarios
-
-## Delta Spec Format
-
-Delta specs use:
-- `## ADDED Requirements`
-- `## MODIFIED Requirements`
-- `## REMOVED Requirements`
-
-## Tasks Format
-
-Tasks grouped by project type and skill:
-```
-## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
-- [ ] Task description
-```
-
-
-## Spec Format
-
-Specs must include:
-- `## Meta` section with project type, domain, stack
-- `## Purpose`
-- `## Requirements` with scenarios
-
-## Delta Spec Format
-
-Delta specs use:
-- `## ADDED Requirements`
-- `## MODIFIED Requirements`
-- `## REMOVED Requirements`
-
-## Tasks Format
-
-Tasks grouped by project type and skill:
-```
-## 1. WordPress plugin – admin settings page (projectType: wordpress-plugin, skill: admin-settings-page)
-- [ ] Task description
-```
-
+#### Handling Parallel Merge Conflicts
+If `heraspec archive` throws a **Parallel Merge Conflict** error:
+1. It means someone else modified the base requirement in the source spec while you were working.
+2. **DO NOT PANIC** and **DO NOT OVERWRITE** manually.
+3. Run: `heraspec sync <slug>`
+4. The system will automatically update your fingerprint to match the new source spec and warn you.
+5. Review your delta spec again. Make sure your `MODIFIED/REMOVED` requirements still make sense given the new source.
+6. Once verified, run `heraspec archive <slug> --yes` again.
 
 ## Spec Format
 
@@ -439,110 +310,14 @@ Example with multiple skills in one change:
 
 **Key rule**: Switch skill.md when switching task groups!
 
-
-
-## 1. WordPress module – Feature (skill: admin-settings-page)
-- [ ] Task 1.1 Create module structure
-- [ ] Task 1.2 Configure registration
-
-## 2. UI/UX – Admin Interface (skill: ui-ux)
-- [ ] Task 2.1 Design color palette
-- [ ] Task 2.2 Create component styles
-
-## 3. Documents – User Guide (skill: documents)
-- [ ] Task 3.1 Write technical docs
-```
-
-**Key rule**: Switch skill.md when switching task groups!
-
-
-
-## 1. WordPress module – Feature (skill: admin-settings-page)
-- [ ] Task 1.1 Create module structure
-- [ ] Task 1.2 Configure registration
-
-## 2. UI/UX – Admin Interface (skill: ui-ux)
-- [ ] Task 2.1 Design color palette
-- [ ] Task 2.2 Create component styles
-
-## 3. Documents – User Guide (skill: documents)
-- [ ] Task 3.1 Write technical docs
-```
-
-**Key rule**: Switch skill.md when switching task groups!
-
-
-
-## 1. WordPress module – Feature (skill: admin-settings-page)
-- [ ] Task 1.1 Create module structure
-- [ ] Task 1.2 Configure registration
-
-## 2. UI/UX – Admin Interface (skill: ui-ux)
-- [ ] Task 2.1 Design color palette
-- [ ] Task 2.2 Create component styles
-
-## 3. Documents – User Guide (skill: documents)
-- [ ] Task 3.1 Write technical docs
-```
-
-**Key rule**: Switch skill.md when switching task groups!
-
-
-
-## 1. WordPress module – Feature (skill: admin-settings-page)
-- [ ] Task 1.1 Create module structure
-- [ ] Task 1.2 Configure registration
-
-## 2. UI/UX – Admin Interface (skill: ui-ux)
-- [ ] Task 2.1 Design color palette
-- [ ] Task 2.2 Create component styles
-
-## 3. Documents – User Guide (skill: documents)
-- [ ] Task 3.1 Write technical docs
-```
-
-**Key rule**: Switch skill.md when switching task groups!
-
-
-
-## 1. WordPress module – Feature (skill: admin-settings-page)
-- [ ] Task 1.1 Create module structure
-- [ ] Task 1.2 Configure registration
-
-## 2. UI/UX – Admin Interface (skill: ui-ux)
-- [ ] Task 2.1 Design color palette
-- [ ] Task 2.2 Create component styles
-
-## 3. Documents – User Guide (skill: documents)
-- [ ] Task 3.1 Write technical docs
-```
-
-**Key rule**: Switch skill.md when switching task groups!
-
-
-
-## 1. WordPress module – Feature (skill: admin-settings-page)
-- [ ] Task 1.1 Create module structure
-- [ ] Task 1.2 Configure registration
-
-## 2. UI/UX – Admin Interface (skill: ui-ux)
-- [ ] Task 2.1 Design color palette
-- [ ] Task 2.2 Create component styles
-
-## 3. Documents – User Guide (skill: documents)
-- [ ] Task 3.1 Write technical docs
-```
-
-**Key rule**: Switch skill.md when switching task groups!
-
 ## Proactive Memory-Aware Development
 
 If \`heraspec/skills/project-memory/\` exists, the agent MUST proactively use memory to maintain project context. DO NOT wait for the user to prompt you to use memory.
 
 ### CRITICAL RULES FOR AUTOMATIC MEMORY USAGE
 1. **Always Check Context First**: At the beginning of a complex task or when encountering an unfamiliar codebase area, you MUST autonomously run \`heraspec memory context\` or \`heraspec memory search "keywords"\` BEFORE writing any code.
-2. **Auto-Log via Archive**: You DO NOT need to run `heraspec memory log` manually. Every time you successfully implement a feature and run `heraspec archive <change-name>`, the system will automatically read your proposal and log the memory observation under the hood. Just use `heraspec archive` as normal!
-3. **Session Summary**: (Optional) When wrapping up a large session, you can run `heraspec memory summarize --request "..." --completed "..."` to compress knowledge, though `archive` already auto-logs completed features.
+2. **Auto-Log via Archive**: You DO NOT need to run \`heraspec memory log\` manually. Every time you successfully implement a feature and run \`heraspec archive <change-name>\`, the system will automatically read your proposal and log the memory observation under the hood. Just use \`heraspec archive\` as normal!
+3. **Session Summary**: (Optional) When wrapping up a large session, you can run \`heraspec memory summarize --request "..." --completed "..."\` to compress knowledge, though \`archive\` already auto-logs completed features.
 
 ### When to SKIP Memory
 - Simple bug fixes, typo corrections, formatting changes

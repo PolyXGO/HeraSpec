@@ -6,22 +6,20 @@ export class TemplateManager {
   static getProjectTemplate(): string {
     return `# HeraSpec Project
 
+## ⚡ Slash Commands (Agent Triggers)
+
+When the user types messages starting with a slash (/), you MUST intercept them as action triggers rather than conversational queries. Please execute the corresponding terminal commands immediately:
+
+- /heraspec [args] : Run the heraspec CLI tool with the provided arguments (e.g. /heraspec validate my-change)
+- /sync : Run heraspec sync <current-change>
+- /archive : Run heraspec archive <current-change> --yes
+- /skill [name] : Run heraspec skill add [name]
+- /hotfix [title] : Run heraspec hotfix [title]
+
+*If the user types a slash command, do not explain what you are going to do, just run the terminal command and report the output.*
+
 ## Overview
 Describe your project here.
-
-## Project Types
-- wordpress-plugin
-- wordpress-theme
-- perfex-module
-- laravel-package
-- node-service
-- generic-webapp
-- backend-api
-- frontend-app
-- multi-stack
-
-## Tech Stack
-List your technologies here (e.g., PHP 8.1, WordPress 6.0, Laravel 10, etc.)
 
 ## Architecture
 Describe the high-level architecture: entry points, module structure, data flow.
@@ -220,6 +218,15 @@ The following commands are classified by risk level. You **MUST NOT** execute th
 - Run: \`heraspec archive <slug> --yes\`
 - This merges delta specs into source specs
 - Moves change folder to archives
+
+#### Handling Parallel Merge Conflicts
+If \`heraspec archive\` throws a **Parallel Merge Conflict** error:
+1. It means someone else modified the base requirement in the source spec while you were working.
+2. **DO NOT PANIC** and **DO NOT OVERWRITE** manually.
+3. Run: \`heraspec sync <slug>\`
+4. The system will automatically update your fingerprint to match the new source spec and warn you.
+5. Review your delta spec again. Make sure your \`MODIFIED/REMOVED\` requirements still make sense given the new source.
+6. Once verified, run \`heraspec archive <slug> --yes\` again.
 
 ## Spec Format
 

@@ -4,6 +4,8 @@
  */
 import path from 'path';
 import ora from 'ora';
+import fs from 'fs';
+import { createHash } from 'crypto';
 import chalk from 'chalk';
 import { FileSystemUtils } from '../utils/file-system.js';
 import {
@@ -129,6 +131,31 @@ export class ArchiveCommand {
         targetContent = await FileSystemUtils.readFile(targetSpecPath);
       }
 
+      // Read fingerprints
+      const fingerprintsPath = path.join(changePath, 'fingerprints.json');
+      let fingerprints: Record<string, string> = {};
+      if (await FileSystemUtils.fileExists(fingerprintsPath)) {
+        fingerprints = JSON.parse(await FileSystemUtils.readFile(fingerprintsPath));
+      }
+
+      // Validate fingerprints
+      const reqs = [...delta.modified, ...delta.removed];
+      for (const req of reqs) {
+        const hashKey = `${relativePath}:${req.name}`;
+        const expectedHash = fingerprints[hashKey];
+        if (expectedHash) {
+          const currentReqBlock = this.extractRequirementBlock(targetContent, req.name);
+          const currentHash = currentReqBlock ? createHash('sha256').update(currentReqBlock).digest('hex') : null;
+          
+          if (currentHash !== expectedHash) {
+            throw new Error(
+              `Parallel Merge Conflict: The requirement "${req.name}" in ${relativePath} has been changed by someone else since you started this change.\n` +
+              `Please run "heraspec sync ${changeName}" to update your base and resolve the conflict.`
+            );
+          }
+        }
+      }
+
       // Merge delta into target
       const mergedContent = this.mergeDeltaIntoSpec(targetContent, delta, deltaSpec.name);
 
@@ -145,23 +172,68 @@ export class ArchiveCommand {
     delta: { added: any[]; modified: any[]; removed: any[] },
     specName: string
   ): string {
-    // Simple merge implementation
-    // In a real implementation, this would be more sophisticated
-    
     let merged = existingContent || `# Spec: ${specName}\n\n## Purpose\n\n## Requirements\n\n`;
 
-    // Add new requirements
-    if (delta.added.length > 0) {
-      merged += '\n## ADDED Requirements\n\n';
-      for (const req of delta.added) {
-        merged += `### Requirement: ${req.name}\n${req.description}\n\n`;
+    // Process removed
+    if (delta.removed && delta.removed.length > 0) {
+      for (const req of delta.removed) {
+        merged = this.modifyRequirementBlock(merged, req.name, null);
       }
     }
 
-    // Note: Full merge logic would require more sophisticated parsing
-    // For now, this is a basic implementation
-    
+    // Process modified
+    if (delta.modified && delta.modified.length > 0) {
+      for (const req of delta.modified) {
+        const newBlock = this.stringifyRequirement(req);
+        merged = this.modifyRequirementBlock(merged, req.name, newBlock);
+      }
+    }
+
+    // Add new requirements
+    if (delta.added && delta.added.length > 0) {
+      for (const req of delta.added) {
+        const newBlock = this.stringifyRequirement(req);
+        merged += `\n${newBlock}`;
+      }
+    }
+
     return merged;
+  }
+
+  private modifyRequirementBlock(content: string, reqName: string, newContent: string | null): string {
+    const escapedName = reqName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const reqRegex = new RegExp(`###\\s+Requirement:\\s*${escapedName}\\s*\\n([\\s\\S]*?)(?=(?:###\\s+Requirement:|$))`, 'i');
+    
+    if (newContent === null) {
+      return content.replace(reqRegex, '');
+    } else {
+      if (reqRegex.test(content)) {
+        return content.replace(reqRegex, newContent);
+      } else {
+        return content + '\\n' + newContent;
+      }
+    }
+  }
+
+  private extractRequirementBlock(content: string, reqName: string): string | null {
+    const escapedName = reqName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const reqRegex = new RegExp(`###\\s+Requirement:\\s*${escapedName}\\s*\\n([\\s\\S]*?)(?=(?:###\\s+Requirement:|$))`, 'i');
+    const match = content.match(reqRegex);
+    return match ? match[0].trim() : null;
+  }
+
+  private stringifyRequirement(req: any): string {
+    let str = `### Requirement: ${req.name}\n${req.description}\n\n`;
+    if (req.scenarios && req.scenarios.length > 0) {
+      for (const sc of req.scenarios) {
+        str += `#### Scenario: ${sc.name}\n`;
+        for (const step of sc.steps) {
+          str += `- ${step}\n`;
+        }
+        str += `\n`;
+      }
+    }
+    return str;
   }
 
   private async moveChangeToArchive(sourcePath: string, archivePath: string): Promise<void> {

@@ -65,7 +65,21 @@ heraspec memory log \
 ```
 > **Auto-Log Note:** You DO NOT NEED to call this command manually if you use the standard workflow. When you run `heraspec archive <change-name>`, the system automatically reads your `proposal.md` and executes this log command under the hood! The `--discovery-tokens` flag will be set automatically to calculate token savings.
 
-#### Search Memory
+#### Quick Hotfix Logging
+For minor bugs where writing a full spec is overkill, you can instantly log a fix to memory:
+```bash
+heraspec hotfix "Fixed login timeout" -n "Increased JWT expiration to 2h in auth.ts"
+```
+
+#### Search Memory (Semantic & Full-text)
+
+**Semantic Search (Vector embeddings - Recommended):**
+```bash
+heraspec memory query "how does authentication work?"
+```
+*(Uses local offline AI model to find contextually relevant observations)*
+
+**Full-text Search (Exact matching):**
 ```bash
 heraspec memory search "authentication"
 heraspec memory search --type decision --concepts "database"

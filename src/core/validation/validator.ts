@@ -4,6 +4,7 @@
  */
 import { readFileSync } from 'fs';
 import path from 'path';
+import { createHash } from 'crypto';
 import { SpecSchema, ChangeSchema } from '../schemas/index.js';
 import { MarkdownParser } from '../parsers/markdown-parser.js';
 import { FileSystemUtils } from '../../utils/file-system.js';
@@ -119,7 +120,7 @@ export class Validator {
     if (await FileSystemUtils.fileExists(specsDir)) {
       const deltaSpecs = await this.findDeltaSpecs(specsDir);
       for (const specPath of deltaSpecs) {
-        const report = await this.validateDeltaSpec(specPath);
+        const report = await this.validateDeltaSpec(specPath, changePath);
         errors.push(...report.errors);
         warnings.push(...report.warnings);
         if (report.suggestions) {
@@ -142,7 +143,7 @@ export class Validator {
     };
   }
 
-  private async validateDeltaSpec(filePath: string): Promise<ValidationReport> {
+  private async validateDeltaSpec(filePath: string, changePath?: string): Promise<ValidationReport> {
     const errors: ValidationIssue[] = [];
     const warnings: ValidationIssue[] = [];
     const suggestions: string[] = [];
@@ -151,6 +152,11 @@ export class Validator {
       const content = readFileSync(filePath, 'utf-8');
       const parser = new MarkdownParser(content);
       const delta = parser.parseDeltaSpec(content);
+
+      // Auto-capture base fingerprints for Modified/Removed requirements
+      if (changePath && (delta.modified.length > 0 || delta.removed.length > 0)) {
+        await this.captureFingerprints(changePath, filePath, delta);
+      }
 
       // Check that delta has at least one section
       if (delta.added.length === 0 && delta.modified.length === 0 && delta.removed.length === 0) {
@@ -215,6 +221,54 @@ export class Validator {
     }
 
     return specs;
+  }
+
+  private async captureFingerprints(changePath: string, deltaSpecPath: string, delta: any): Promise<void> {
+    const changeName = path.basename(changePath);
+    // Find corresponding source spec path
+    const specsDir = path.join(HERASPEC_DIR_NAME, SPECS_DIR_NAME);
+    const deltaSpecsDir = path.join(specsDir, changeName);
+    
+    // Using string replacement to resolve relative paths might be tricky with path separators. 
+    // A safer way:
+    const relativePath = path.relative(path.resolve(deltaSpecsDir), path.resolve(deltaSpecPath));
+    const sourceSpecPath = path.join(path.resolve(specsDir), relativePath);
+
+    let sourceContent = '';
+    if (await FileSystemUtils.fileExists(sourceSpecPath)) {
+      sourceContent = readFileSync(sourceSpecPath, 'utf-8');
+    }
+
+    const fingerprintsPath = path.join(changePath, 'fingerprints.json');
+    let fingerprints: Record<string, string> = {};
+    if (await FileSystemUtils.fileExists(fingerprintsPath)) {
+      fingerprints = JSON.parse(readFileSync(fingerprintsPath, 'utf-8'));
+    }
+
+    let updated = false;
+    const reqs = [...delta.modified, ...delta.removed];
+    
+    for (const req of reqs) {
+      const hashKey = `${relativePath}:${req.name}`;
+      if (!fingerprints[hashKey]) {
+        const reqBlock = this.extractRequirementBlock(sourceContent, req.name);
+        if (reqBlock) {
+          fingerprints[hashKey] = createHash('sha256').update(reqBlock).digest('hex');
+          updated = true;
+        }
+      }
+    }
+
+    if (updated) {
+      await FileSystemUtils.writeFile(fingerprintsPath, JSON.stringify(fingerprints, null, 2));
+    }
+  }
+
+  private extractRequirementBlock(content: string, reqName: string): string | null {
+    const escapedName = reqName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const reqRegex = new RegExp(`###\\s+Requirement:\\s*${escapedName}\\s*\\n([\\s\\S]*?)(?=(?:###\\s+Requirement:|$))`, 'i');
+    const match = content.match(reqRegex);
+    return match ? match[0].trim() : null;
   }
 }
 

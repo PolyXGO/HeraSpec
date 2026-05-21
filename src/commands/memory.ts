@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { MemoryStore } from '../core/memory/memory-store.js';
 import { MemorySearch } from '../core/memory/memory-search.js';
+import { MemoryVector } from '../core/memory/memory-vector.js';
 import { ContextGenerator } from '../core/memory/context-generator.js';
 import { OBSERVATION_TYPES, OBSERVATION_TYPE_ICONS, estimateTokens } from '../core/memory/memory-types.js';
 import type { ObservationType } from '../core/memory/memory-types.js';
@@ -44,6 +45,11 @@ export class MemoryCommand {
       store.open();
 
       try {
+        // Generate embedding
+        const textToEmbed = `${options.title} ${options.narrative || ''} ${options.concepts || ''}`.trim();
+        let embedding: number[] | undefined;
+        try { embedding = await MemoryVector.generateEmbedding(textToEmbed); } catch (e) { /* ignore */ }
+
         const obs = store.addObservation({
           type: options.type as ObservationType,
           title: options.title,
@@ -54,6 +60,7 @@ export class MemoryCommand {
           discoveryTokens: options.discoveryTokens ? parseInt(options.discoveryTokens, 10) : 0,
           sessionId: options.sessionId,
           project: options.project,
+          embedding,
         });
 
         const icon = OBSERVATION_TYPE_ICONS[obs.type] || '📌';
@@ -78,6 +85,39 @@ export class MemoryCommand {
       await this.optimize({ yes: true, silent: true }, projectPath);
     } catch (e) {
       // Ignore auto-optimize errors
+    }
+  }
+
+  /**
+   * heraspec memory query - Semantic search using Vector embeddings
+   */
+  async query(question: string, options: { limit?: number; project?: string; } = {}, projectPath: string = '.'): Promise<void> {
+    const spinner = ora('Generating embedding for query...').start();
+    try {
+      const store = new MemoryStore(projectPath);
+      store.open();
+      try {
+        const observations = store.getRecentObservations(options.project, 5000); // Fetch all to rank
+        
+        spinner.text = 'Calculating semantic similarity...';
+        const results = await MemoryVector.search(question, observations, options.limit || 10);
+        
+        spinner.stop();
+        if (results.length === 0) {
+           console.log(chalk.yellow('\nNo relevant observations found using vector search.\n'));
+           return;
+        }
+
+        console.log(chalk.cyan('\n🔍 Semantic Search Results:\n'));
+        const search = new MemorySearch(store);
+        console.log(search.formatResultsAsIndex(results, question));
+        console.log(chalk.gray('\n💡 Note: Results are ranked by semantic similarity, not chronologically.'));
+      } finally {
+        store.close();
+      }
+    } catch (error) {
+      spinner.fail(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      process.exitCode = 1;
     }
   }
 

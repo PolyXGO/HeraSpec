@@ -253,6 +253,7 @@ This command will:
 - Merge delta specs into source specs
 - Move change folder to `archives/` with date prefix
 - Update source of truth specs
+- **Parallel Merge Safety**: Checks fingerprints to prevent overwriting changes made by other agents concurrently. (See `heraspec sync`).
 - **Auto-Log Memory**: Automatically extract the content of `proposal.md` and log it as an Observation in the Memory DB, while silently optimizing the memory configuration.
 
 ### 6. Generate Product Documentation
@@ -369,7 +370,22 @@ Archive completed change and merge specs.
 heraspec archive add-two-factor-auth --yes
 ```
 
-**Note**: Without `--yes` will require confirmation.
+**Notes:**
+- Without `--yes` will require confirmation.
+- **Parallel Merge Safety**: When you run `archive`, HeraSpec will verify the original base fingerprints of any `MODIFIED` or `REMOVED` requirements to ensure nobody else has changed them in the source spec since you started your change. If a conflict is detected, the archive process will abort and ask you to run `heraspec sync`.
+
+### `heraspec sync <change-name>`
+
+Sync a change with its source specs to resolve parallel merge conflicts.
+
+```bash
+heraspec sync add-two-factor-auth
+```
+
+**Functionality:**
+- Compares the fingerprints of your delta specs against the current source specs.
+- If the source spec has been updated by someone else, this command will update your local fingerprints to match the new source.
+- You will be warned to review your delta spec to ensure your modifications still apply correctly to the newly updated source before you attempt to `archive` again.
 
 ### `heraspec skill list`
 
@@ -1187,6 +1203,14 @@ These tools also support AGENTS.md:
 1. Ensure `AGENTS.heraspec.md` file exists at root
 2. Ask AI in correct format
 3. AI will follow workflow in AGENTS.heraspec.md
+
+### Soft Slash Commands (Agent Triggers)
+
+While HeraSpec doesn't inject native slash commands into your IDE's UI dropdown (like `/goal` or `/schedule`), you can configure your AI Agent to recognize slash commands as terminal triggers.
+
+In your `AGENTS.heraspec.md`, there is a section called `## ⚡ Slash Commands (Agent Triggers)`. When you type commands like `/heraspec validate ...`, `/sync`, or `/skill ui-ux` in the chat, the AI Agent will read this rule and immediately execute the corresponding terminal command instead of answering conversationally.
+
+You can add custom shortcut commands to `AGENTS.heraspec.md` to suit your project's needs!
 
 ### How to Prompt AI with Skills
 

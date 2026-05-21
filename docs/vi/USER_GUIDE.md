@@ -253,6 +253,7 @@ Lệnh này sẽ:
 - Merge delta specs vào source specs
 - Di chuyển change folder vào `archives/` với prefix ngày tháng
 - Cập nhật source of truth specs
+- **Parallel Merge Safety**: Kiểm tra fingerprint để chặn việc vô tình ghi đè lên những thay đổi mà agent khác đang làm song song (Xem lệnh `heraspec sync`).
 - **Tự động lưu Memory**: Trích xuất nội dung `proposal.md` và ghi nhận thành một Observation trong Memory DB, đồng thời tự động tối ưu hóa cấu hình bộ nhớ.
 
 ### 6. Tạo Tài Liệu Sản Phẩm (Generate Documentation)
@@ -369,7 +370,22 @@ Lưu trữ change đã hoàn thành và merge specs.
 heraspec archive add-two-factor-auth --yes
 ```
 
-**Lưu ý**: Không dùng `--yes` sẽ yêu cầu xác nhận.
+**Lưu ý**: 
+- Không dùng `--yes` sẽ yêu cầu xác nhận.
+- **Parallel Merge Safety**: Khi chạy lệnh `archive`, HeraSpec sẽ xác minh mã hash (fingerprint) nguyên bản của các requirement bị `MODIFIED` hoặc `REMOVED` để đảm bảo không có agent/người nào khác đã thay đổi nội dung đó ở source spec gốc trong lúc bạn đang làm việc. Nếu phát hiện xung đột, quá trình lưu trữ sẽ bị hủy và yêu cầu bạn chạy `heraspec sync`.
+
+### `heraspec sync <change-name>`
+
+Đồng bộ change với source spec gốc để giải quyết Parallel Merge Conflicts.
+
+```bash
+heraspec sync add-two-factor-auth
+```
+
+**Chức năng:**
+- So sánh các fingerprint của delta spec so với source spec hiện tại.
+- Nếu source spec đã bị người khác cập nhật, lệnh này sẽ cập nhật các fingerprint cục bộ của bạn để khớp với nội dung source mới.
+- Hệ thống sẽ cảnh báo bạn nên xem lại delta spec một lần nữa để đảm bảo các sửa đổi của bạn vẫn chính xác và hợp lý với source mới trước khi thử chạy lại `archive`.
 
 ### `heraspec skill list`
 
@@ -1129,6 +1145,14 @@ Các công cụ này cũng hỗ trợ AGENTS.md:
 1. Đảm bảo file `AGENTS.heraspec.md` đã tồn tại ở thư mục gốc.
 2. Đặt câu hỏi cho AI theo đúng định dạng.
 3. AI sẽ tuân theo workflow được định nghĩa trong file `AGENTS.heraspec.md`.
+
+### Soft Slash Commands (Agent Triggers)
+
+Mặc dù HeraSpec không can thiệp trực tiếp vào giao diện (UI dropdown) của IDE để tạo các lệnh có sẵn (như `/goal` hay `/schedule`), bạn vẫn có thể cấu hình để AI Agent hiểu các lệnh slash commands này như những tác vụ chạy terminal.
+
+Trong file `AGENTS.heraspec.md`, đã có sẵn phần `## ⚡ Slash Commands (Agent Triggers)`. Khi bạn gõ các lệnh như `/heraspec validate ...`, `/sync`, hoặc `/skill ui-ux` vào khung chat, AI Agent sẽ đọc quy tắc này và ngay lập tức chạy lệnh terminal tương ứng thay vì trả lời theo kiểu giao tiếp thông thường.
+
+Bạn hoàn toàn có thể tự bổ sung thêm các lệnh tắt (shortcut commands) mới vào `AGENTS.heraspec.md` để phù hợp với dự án của mình!
 
 ### Cách Gửi Prompt Cho AI Kèm Skill
 

@@ -42,9 +42,23 @@ heraspec memory log \
   --narrative "Triển khai JWT auth với refresh tokens..."
 
 ```
-> **Lưu ý Tự Động (Auto-Log):** Bạn KHÔNG CẦN gọi lệnh này thủ công nếu bạn dùng quy trình chuẩn. Khi bạn chạy lệnh `heraspec archive <change-name>`, hệ thống sẽ tự động đọc `proposal.md` và thực thi lệnh log ngầm bên dưới! Cờ `--discovery-tokens` sẽ được thiết lập tự động để tính toán độ tiết kiệm.
+> **Lưu ý Tự động Log:** Bạn KHÔNG CẦN gọi lệnh này thủ công nếu dùng quy trình chuẩn. Khi bạn chạy `heraspec archive <change-name>`, hệ thống tự động đọc `proposal.md` và chạy ngầm lệnh log này! Cờ `--discovery-tokens` cũng tự động được tính toán để xem bạn tiết kiệm được bao nhiêu token.
 
-#### Tìm Kiếm Memory
+#### Ghi nhận lỗi nhanh (Hotfix)
+Đối với các lỗi (bug) nhỏ không đáng để viết toàn bộ Spec, bạn có thể log trực tiếp vào bộ nhớ:
+```bash
+heraspec hotfix "Sửa lỗi timeout khi đăng nhập" -n "Đã tăng thời hạn JWT lên 2h trong file auth.ts"
+```
+
+#### Tìm kiếm Bộ nhớ (Semantic & Full-text)
+
+**Tìm kiếm theo Ngữ nghĩa (Semantic Vector Search - Khuyên dùng):**
+```bash
+heraspec memory query "cơ chế xác thực (auth) hoạt động ra sao?"
+```
+*(Sử dụng model AI tích hợp cục bộ để hiểu câu hỏi và tìm các context liên quan)*
+
+**Tìm kiếm theo từ khóa (Full-text Search):**
 ```bash
 heraspec memory search "authentication"
 heraspec memory search --type decision --concepts "database"

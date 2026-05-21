@@ -32,25 +32,17 @@ HeraSpec is a specification-based development framework that helps you:
 
 ## Important Note
 
-> **Note:** HeraSpec is a workflow that I have synthesized, tested, and am currently applying to my work. I constantly refine it to fit small and medium projects, especially for solo freelancers working alone: coding on demand, selling plugins, modules, themes, and software on platforms like Envato.
+> **Note:** HeraSpec is a workflow framework that I have personally designed, tested, and continuously refined through real-world production use. It is primarily optimized for small to medium-sized projects, especially for solo developers and freelancers building products independently — including plugins, modules, themes, templates, and software distributed on platforms such as **Envato**.
 >
-> Therefore, there may be many components and structures that are not strictly standardized or suitable for large and complex processes. In such cases, please skip or adjust them accordingly—ask your AI Agents to tailor it to your needs!
+> HeraSpec serves as the specification and workflow backbone behind the entire **PolyCMS.org** ecosystem and multiple commercial products developed under the Antigravity workflow.
 >
-> **If you have any suggestions for new skills to supplement HeraSpec, please let me know!** Good luck with love!
-
-<!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
+> It powers AI-assisted architecture planning, specification management, documentation pipelines, content operations, and development workflows through a multi-model ecosystem built around **Google Gemini**, **OpenAI** ChatGPT, and Anthropic Claude Opus.
+>
+> Because HeraSpec evolved from practical production needs rather than enterprise-first design, some structures, conventions, or workflows may not be fully standardized or suitable for highly complex large-scale organizations. In such cases, you are encouraged to adapt, simplify, or restructure the system to better fit your own workflow and operational requirements — including asking your AI agents to customize and extend it accordingly.
+>
+> **If you have ideas, improvements, or additional skills that could enhance HeraSpec, contributions and suggestions are always welcome.**
+>
+> Good luck, and build with love.
 
 <!-- HeraSpec Section -->
 
@@ -112,7 +104,7 @@ For more information, see the [HeraSpec documentation](https://github.com/your-o
 
 ---
 
-*This section is automatically updated by `heraspec init`. Last updated: 2026-05-03*
+*This section is automatically updated by `heraspec init`. Last updated: 2026-05-21*
 
 
 ## Installation

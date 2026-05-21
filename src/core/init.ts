@@ -165,11 +165,53 @@ export class InitCommand {
 
     // Create config.yaml (only if not exists)
     if (!(await FileSystemUtils.fileExists(configYamlPath))) {
-      await FileSystemUtils.writeFile(
-        configYamlPath,
-        TemplateManager.getConfigTemplate()
-      );
+      if (projectExists) {
+        await this.migrateLegacyProjectMd(projectMdPath, configYamlPath);
+      } else {
+        await FileSystemUtils.writeFile(
+          configYamlPath,
+          TemplateManager.getConfigTemplate()
+        );
+      }
     }
+  }
+
+  /**
+   * Migrate legacy project.md (extract technical configs to config.yaml)
+   */
+  private async migrateLegacyProjectMd(projectMdPath: string, configYamlPath: string): Promise<void> {
+    const content = await FileSystemUtils.readFile(projectMdPath);
+    let newYaml = `projectType: generic-webapp\nprojectName: "HeraSpec Project"\ndescription: "A new project using HeraSpec"\nskills: []\n`;
+    
+    // Attempt to extract project type
+    const projectTypeMatch = content.match(/## Project Types\\s*\\n\\s*-\\s*([a-zA-Z0-9-]+)/);
+    if (projectTypeMatch && projectTypeMatch[1]) {
+       newYaml = newYaml.replace(/projectType:.*/, `projectType: ${projectTypeMatch[1]}`);
+    }
+
+    // Try to extract tech stack
+    const stackMatch = content.match(/## Tech Stack\\s*\\n([^#]+)/);
+    if (stackMatch && stackMatch[1]) {
+       const stackItems = stackMatch[1].split('\\n')
+         .filter(line => line.trim().startsWith('-'))
+         .map(line => line.replace('-', '').trim());
+       if (stackItems.length > 0) {
+         newYaml += `techStack:\n` + stackItems.map(item => `  - "${item}"`).join('\n') + '\n';
+       }
+    }
+
+    await FileSystemUtils.writeFile(configYamlPath, newYaml);
+    
+    // Optionally clean up project.md by removing Project Types and Tech Stack
+    let updatedMd = content;
+    updatedMd = updatedMd.replace(/## Project Types[\\s\\S]*?(?=##|$)/, '');
+    updatedMd = updatedMd.replace(/## Tech Stack[\\s\\S]*?(?=##|$)/, '');
+    
+    // Also add a migration note at top if not present
+    if (!updatedMd.includes('<!-- HeraSpec Update: Migrated config to config.yaml -->')) {
+        updatedMd = `<!-- HeraSpec Update: Migrated config to config.yaml -->\n` + updatedMd.trimStart();
+    }
+    await FileSystemUtils.writeFile(projectMdPath, updatedMd);
   }
 
   /**

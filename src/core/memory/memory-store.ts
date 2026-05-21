@@ -124,8 +124,8 @@ export class MemoryStore {
     const project = input.project || this.detectProjectName();
 
     const stmt = this.db.prepare(`
-      INSERT INTO observations (session_id, project, type, title, narrative, concepts, files_read, files_modified, discovery_tokens, created_at, created_at_epoch)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO observations (session_id, project, type, title, narrative, concepts, files_read, files_modified, discovery_tokens, embedding, created_at, created_at_epoch)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
@@ -138,6 +138,7 @@ export class MemoryStore {
       JSON.stringify(input.filesRead || []),
       JSON.stringify(input.filesModified || []),
       input.discoveryTokens || 0,
+      input.embedding ? JSON.stringify(input.embedding) : null,
       now.toISOString(),
       now.getTime()
     );
@@ -508,6 +509,7 @@ export class MemoryStore {
       filesRead: this.parseJsonArray(row.files_read),
       filesModified: this.parseJsonArray(row.files_modified),
       discoveryTokens: row.discovery_tokens || 0,
+      embedding: row.embedding ? JSON.parse(row.embedding) : undefined,
       createdAt: row.created_at,
       createdAtEpoch: row.created_at_epoch,
     };

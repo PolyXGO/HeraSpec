@@ -65,6 +65,7 @@
   "dependencies": {
     "@inquirer/core": "^10.2.2",
     "@inquirer/prompts": "^7.8.0",
+    "@xenova/transformers": "^2.17.2",
     "better-sqlite3": "^11.7.0",
     "chalk": "^5.5.0",
     "commander": "^14.0.0",

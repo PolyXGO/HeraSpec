@@ -3,7 +3,7 @@
  * SQLite schema definitions, FTS5 indexes, and migration system
  */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 /**
  * Core table definitions
@@ -33,6 +33,7 @@ export const CREATE_TABLES = `
     files_read TEXT DEFAULT '[]',
     files_modified TEXT DEFAULT '[]',
     discovery_tokens INTEGER DEFAULT 0,
+    embedding TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     created_at_epoch INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000)
   );
@@ -199,7 +200,14 @@ export function runMigrations(db: any): void {
       CREATE INDEX IF NOT EXISTS idx_history_project ON db_history(project);
     `);
   }
-  // if (currentVersion < 3) { migrateTo3(db); }
+
+  if (currentVersion < 3) {
+    // Check if column exists before adding to prevent errors if manually added
+    const columnExists = db.prepare("PRAGMA table_info(observations)").all().some((col: any) => col.name === 'embedding');
+    if (!columnExists) {
+      db.exec(`ALTER TABLE observations ADD COLUMN embedding TEXT;`);
+    }
+  }
 
   db.pragma(`user_version = ${SCHEMA_VERSION}`);
 }

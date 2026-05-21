@@ -8,6 +8,7 @@ import { dirname, join } from 'path';
 import { InitCommand } from '../core/init.js';
 import { ListCommand } from '../core/list.js';
 import { ArchiveCommand } from '../core/archive.js';
+import { SyncCommand } from '../core/sync.js';
 import { RestoreCommand } from '../core/restore.js';
 import { ShowCommand } from '../commands/show.js';
 import { ValidateCommand } from '../commands/validate.js';
@@ -18,6 +19,7 @@ import { MakeTestCommand } from '../commands/make-test.js';
 import { MakeCodeCommand } from '../commands/make-code.js';
 import { SuggestCommand } from '../commands/suggest.js';
 import { MemoryCommand } from '../commands/memory.js';
+import { HotfixCommand } from '../commands/hotfix.js';
 import { ExploreCommand } from '../commands/explore.js';
 
 const require = createRequire(import.meta.url);
@@ -99,6 +101,19 @@ program
     try {
       const archiveCommand = new ArchiveCommand();
       await archiveCommand.execute(changeName, options);
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('sync [change-name]')
+  .description('Sync a change with its source specs to resolve parallel merge conflicts')
+  .action(async (changeName?: string) => {
+    try {
+      const syncCommand = new SyncCommand();
+      await syncCommand.execute(changeName);
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);
@@ -294,6 +309,20 @@ skillCmd
     }
   });
 
+program
+  .command('hotfix <title>')
+  .description('Fast-track shortcut to log a bugfix directly to memory')
+  .option('-n, --narrative <text>', 'Describe the fix (narrative)')
+  .action(async (title: string, options: any) => {
+    try {
+      const hotfixCommand = new HotfixCommand();
+      await hotfixCommand.execute(title, options, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
 // Memory commands
 const memoryCmd = program
   .command('memory')
@@ -315,6 +344,21 @@ memoryCmd
     try {
       const memoryCommand = new MemoryCommand();
       await memoryCommand.log(options, '.');
+    } catch (error) {
+      console.error(`Error: ${(error as Error).message}`);
+      process.exit(1);
+    }
+  });
+
+memoryCmd
+  .command('query <question>')
+  .description('Search observations using semantic vector embeddings')
+  .option('--limit <n>', 'Max results', '10')
+  .option('--project <name>', 'Filter by project')
+  .action(async (question: string, options: any) => {
+    try {
+      const memoryCommand = new MemoryCommand();
+      await memoryCommand.query(question, { limit: parseInt(options.limit), project: options.project }, '.');
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);
       process.exit(1);

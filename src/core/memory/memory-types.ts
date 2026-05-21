@@ -26,7 +26,8 @@ export interface Observation {
   concepts: string[];       // Tags for categorization
   filesRead: string[];      // Files read during this observation
   filesModified: string[];  // Files modified during this observation
-  discoveryTokens: number;  // Estimated tokens spent discovering this
+  discoveryTokens: number;
+  embedding?: number[]; // Vector embedding  // Estimated tokens spent discovering this
   createdAt: string;        // ISO 8601 timestamp
   createdAtEpoch: number;   // Unix timestamp in milliseconds
 }
@@ -41,6 +42,7 @@ export interface ObservationInput {
   filesRead?: string[];
   filesModified?: string[];
   discoveryTokens?: number;
+  embedding?: number[];
 }
 
 // ============ Session Summary Types ============
