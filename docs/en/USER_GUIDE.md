@@ -1365,6 +1365,30 @@ If you encounter issues:
 3. Validate changes/specs to find errors
 4. Create issue on GitHub repository
 
+
+## Frequently Asked Questions (FAQ's)
+
+### 1. What is the difference between a Change and a Delta Spec?
+- **Change** (managed in `heraspec/changes/`): Acts like a "ticket" or "pull request". It manages the progress of work (`tasks.md`) and the plan (`proposal.md`). It represents the process of implementing a specific task.
+- **Delta Spec** (managed in `heraspec/specs/<change-name>/`): Acts as a temporary technical document describing what is ADDED, MODIFIED, or DELETED compared to the existing system. When the Change is archived, this Delta Spec is merged into the Source of Truth specs.
+
+### 2. Where do completed Features and Specs go?
+- **Changes (The Work):** The change folder is moved into `archives/` as a permanent, immutable historical record.
+- **Delta Specs (The Documentation):** They are merged into the `specs/global/` (Source of Truth) directory. These Source of Truth specs act as living documentation reflecting the current state of the project. The temporary Delta Specs are then deleted.
+
+### 3. Where are source code modifications logged in the Archives?
+- **File-level modifications:** Documented inside the `tasks.md` file within the archived change folder, serving as a historical checklist of what files were touched.
+- **Architectural meaning:** Reflected in the updated Source of Truth specs.
+- **AI Memory System:** Modifications are also automatically logged into the local SQLite memory database, allowing you to query historical decisions using `heraspec memory query`.
+
+### 4. What is the workflow for updating or modifying an archived feature?
+You should **NEVER** move a Change out of `archives/` back into `changes/`. Instead, you must create a **NEW Change**:
+- Use `heraspec memory query` or read the Source of Truth specs to gather context.
+- Create a new Change (e.g., `heraspec change create "add-2fa-to-login"`).
+- Write a new `proposal.md` and Delta Spec detailing the modifications relative to the current state.
+- Once completed, archive this new Change. For minor bugs, you can bypass this workflow using the `heraspec hotfix` command.
+
+
 ---
 
 **Happy using HeraSpec!** 🚀

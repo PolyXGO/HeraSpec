@@ -1307,6 +1307,30 @@ Nếu gặp vấn đề:
 3. Validate changes/specs để tìm lỗi
 4. Tạo issue trên GitHub repository
 
+
+## Câu Hỏi Thường Gặp (FAQ's)
+
+### 1. Sự khác nhau giữa Change và Delta Spec là gì?
+- **Change** (quản lý trong `heraspec/changes/`): Giống như một "ticket" (Jira/Trello), nó quản lý tiến độ công việc (`tasks.md`) và kế hoạch (`proposal.md`). Nó là quá trình thực hiện một nhiệm vụ cụ thể.
+- **Delta Spec** (quản lý trong `heraspec/specs/<change-name>/`): Là bản phác thảo tài liệu kỹ thuật mô tả sự thay đổi so với hệ thống gốc. Thay vì sửa trực tiếp vào tài liệu gốc, bạn ghi chú lại những gì cần THÊM, SỬA, hoặc XÓA. Khi Change hoàn tất, Delta Spec sẽ được "gộp" (merge) vào tài liệu gốc.
+
+### 2. Các tính năng và Specs khi hoàn tất sẽ đi về đâu?
+- **Với Change (Công việc):** Sẽ được đưa vào thư mục `archives/` để làm lịch sử lưu trữ vĩnh viễn. Những gì trong `archives/` là bất biến.
+- **Với Delta Specs (Tài liệu):** Sẽ được gộp (merge) vào thư mục `specs/global/` (Source of Truth) để làm tài liệu sống (living documentation) phản ánh cấu trúc hiện tại của dự án. Sau đó bản nháp Delta Spec sẽ bị xóa.
+
+### 3. Sửa đổi trên source code được lưu ở đâu trong Archives?
+- **Chi tiết từng file code:** Nằm trong file `tasks.md` của thư mục Change đã được archive. File này ghi lại lịch sử từng dòng task đã thực hiện.
+- **Ý nghĩa cấu trúc:** Nằm trong tài liệu Spec gốc (`specs/global/`) đã được cập nhật.
+- **Hệ thống AI Memory:** Thông tin sửa đổi cũng được tự động lưu vào bộ nhớ cục bộ SQLite, cho phép bạn truy vấn lại quyết định lịch sử bằng lệnh `heraspec memory query`.
+
+### 4. Quy trình sửa đổi, cập nhật một tính năng đã đưa vào Archives?
+Tuyệt đối **KHÔNG** đưa một Change từ `archives/` ngược lại `changes/`. Bạn cần tạo một **Change mới** hoàn toàn:
+- Dùng `heraspec memory query` hoặc xem Spec gốc để lấy ngữ cảnh.
+- Tạo một Change mới (VD: `heraspec change create "them-2fa-vao-login"`).
+- Viết `proposal.md` và Delta Spec mới mô tả sự thay đổi so với hiện tại.
+- Code xong, bạn tiếp tục `archive` Change mới này. Với các lỗi vặt, bạn có thể dùng lệnh ưu tiên `heraspec hotfix` thay vì tạo cả một Change cồng kềnh.
+
+
 ---
 
 **Chúc bạn sử dụng HeraSpec hiệu quả!** 🚀
