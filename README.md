@@ -51,7 +51,7 @@ Here are some products built partially or entirely using the HeraSpec framework:
 <ul>
     <li><a href="https://codecanyon.net/item/flexinote-for-perfex-crm/60590690" target="_blank">FlexNote for Perfex CRM</a> - Advanced note management with AI capabilities.</li>
     <li><a href="https://codecanyon.net/item/polyutilities-for-perfex-crm-quick-access-menu-custom-js-css-and-more/49522529" target="_blank">PolyUtilities for Perfex CRM</a> - Essential toolkit for Perfex CRM customization.</li>
-    <li><a href="https://erp.polyxgo.com/code/project/demo-builder-for-perfex-crm" target="_blank">Data Builder — Visual Reporting, REST API & GraphQL for Perfex CRM</a> - Automated demo instance creator.</li>
+    <li><a href="https://codecanyon.net/item/data-builder-for-perfex-crm/62297963" target="_blank">Data Builder — Visual Reporting, REST API & GraphQL for Perfex CRM</a> - Automated demo instance creator.</li>
     <li><a href="https://chromewebstore.google.com/detail/flexinote/oendkbllnfafakogepolfaonionlkehc" target="_blank">FlexNote - Sticky Notes for Web</a> - Create, manage, and customize notes directly on any webpage.<br>
     GitHub: <a href="https://github.com/PolyXGO/FlexiNote-extension" target="_blank">FlexNote - Smart Sticky Notes</a></li>
     <li><a href="https://erp.polyxgo.com/code/project/polymetrics" target="_blank">PolyMetrics</a> - Product price analysis extension for Envato.</li>
