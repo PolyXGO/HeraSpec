@@ -49,6 +49,7 @@ HeraSpec is a specification-based development framework that helps you:
 <!-- HeraSpec Section -->
 
 <!-- HeraSpec Section -->
+
 ## HeraSpec Development
 
 This project uses [HeraSpec](https://github.com/your-org/heraspec) for spec-driven development.
@@ -106,7 +107,6 @@ For more information, see the [HeraSpec documentation](https://github.com/your-o
 
 *This section is automatically updated by `heraspec init`. Last updated: 2026-05-21*
 
-
 ## Installation
 
 ```bash
@@ -160,12 +160,16 @@ Here are some products built partially or entirely using the HeraSpec framework:
 <ul>
     <li><a href="https://codecanyon.net/item/flexinote-for-perfex-crm/60590690" target="_blank">FlexNote for Perfex CRM</a> - Advanced note management with AI capabilities.</li>
     <li><a href="https://codecanyon.net/item/polyutilities-for-perfex-crm-quick-access-menu-custom-js-css-and-more/49522529" target="_blank">PolyUtilities for Perfex CRM</a> - Essential toolkit for Perfex CRM customization.</li>
-    <li><a href="https://erp.polyxgo.com/code/project/demo-builder-for-perfex-crm" target="_blank">Demo Builder for Perfex CRM</a> - Automated demo instance creator.</li>
+    <li><a href="https://erp.polyxgo.com/code/project/demo-builder-for-perfex-crm" target="_blank">Data Builder — Visual Reporting, REST API & GraphQL for Perfex CRM</a> - Automated demo instance creator.</li>
     <li><a href="https://chromewebstore.google.com/detail/flexinote/oendkbllnfafakogepolfaonionlkehc" target="_blank">FlexNote - Sticky Notes for Web</a> - Create, manage, and customize notes directly on any webpage.<br>
     GitHub: <a href="https://github.com/PolyXGO/FlexiNote-extension" target="_blank">FlexNote - Smart Sticky Notes</a></li>
     <li><a href="https://erp.polyxgo.com/code/project/polymetrics" target="_blank">PolyMetrics</a> - Product price analysis extension for Envato.</li>
     <li><a href="https://erp.polyxgo.com/code/project/polydemo" target="_blank">PolyDemo</a> - Dynamic demonstration environment for web applications.</li>
     <li><a href="https://erp.polyxgo.com/code/project/smart-payment-for-perfex-crm" target="_blank">Smart Payment for Perfex CRM</a> - Intelligent payment gateway integration.</li>
+    <li><a href="https://polycms.org" target="_blank">PolyCMS.org</a> - Open Source CMS based on Laravel, inspired by WordPress CMS.</li>
+    <li><a href="https://codecanyon.net/item/polycms-cms-website-builder-module-for-perfex-crm/63404011" target="_blank">PolyCMS – CMS & Website Builder Module for Perfex CRM</a> - A CMS system inspired by WordPress integrated into the open-source Perfex CRM.</li>
+    <li><a href="https://codecanyon.net/item/woosync-woocommerce-orders-customers-invoices-sync-for-perfex-crm/63032352" target="_blank">WooCommerce Sync for Perfex CRM</a> - A module for syncing products, customers, orders, and data between Perfex CRM and WooCommerce stores.</li>
+    <li><a href="https://headrandom.com" target="_blank">HeadRandom.com</a> - Products and content on this platform are managed with the support of HeraSpec.</li>
 </ul>
 
 ### Plugin WordPress cho Phong Thủy Huyền Học
