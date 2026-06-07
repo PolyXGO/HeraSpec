@@ -17,7 +17,7 @@ When running `heraspec init` on a previously initialized project, HeraSpec will 
 - **Behavior**: Only creates directory if it doesn't exist, does not delete or modify content
 
 ### ✅ Archives
-- **Location**: `heraspec/changes/archives/`
+- **Location**: `heraspec/archives/`
 - **Status**: **100% SAFE**
 - **Behavior**: Only creates directory if it doesn't exist, does not delete or modify content
 
@@ -65,7 +65,7 @@ When running `heraspec init` on a previously initialized project, HeraSpec will 
 |------|--------|----------|
 | `heraspec/changes/` | ✅ Safe | Only creates directory, doesn't delete/modify |
 | `heraspec/specs/` | ✅ Safe | Only creates directory, doesn't delete/modify |
-| `heraspec/changes/archives/` | ✅ Safe | Only creates directory, doesn't delete/modify |
+| `heraspec/archives/` | ✅ Safe | Only creates directory, doesn't delete/modify |
 | `heraspec/project.md` | ✅ Safe | Doesn't overwrite if already exists |
 | `heraspec/config.yaml` | ✅ Safe | Doesn't overwrite if already exists |
 | `heraspec/skills/` | ✅ New | Creates directory and README if doesn't exist |

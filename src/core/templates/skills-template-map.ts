@@ -17,96 +17,146 @@ export interface SkillTemplateInfo {
 export const SKILL_TEMPLATE_MAP: Record<string, SkillTemplateInfo> = {
   // Cross-cutting skills
   'ui-ux': {
-    templateFileName: 'ui-ux-skill.md',
+    templateFileName: 'ui-ux/skill.md',
     isCrossCutting: true,
-    resourceDirs: ['scripts', 'templates', 'data'],
+    resourceDirs: ['ui-ux/scripts', 'ui-ux/templates', 'ui-ux/data'],
   },
   'design-system': {
-    templateFileName: 'design-system-skill.md',
+    templateFileName: 'design-system/skill.md',
     isCrossCutting: true,
-    resourceDirs: ['scripts', 'data', 'knowledge/design-systems'],
+    resourceDirs: ['ui-ux/scripts', 'ui-ux/data', 'design-system/knowledge/design-systems'],
   },
   'documents': {
-    templateFileName: 'documents-skill.md',
+    templateFileName: 'documents/skill.md',
     isCrossCutting: true,
     resourceDirs: ['documents/templates'],
   },
   'content-optimization': {
-    templateFileName: 'content-optimization-skill.md',
+    templateFileName: 'content-optimization/skill.md',
     isCrossCutting: true,
   },
   'unit-test': {
-    templateFileName: 'unit-test-skill.md',
+    templateFileName: 'unit-test/skill.md',
     isCrossCutting: true,
   },
   'integration-test': {
-    templateFileName: 'integration-test-skill.md',
+    templateFileName: 'integration-test/skill.md',
     isCrossCutting: true,
   },
   'e2e-test': {
-    templateFileName: 'e2e-test-skill.md',
+    templateFileName: 'e2e-test/skill.md',
     isCrossCutting: true,
   },
   'suggestion': {
-    templateFileName: 'suggestion-skill.md',
+    templateFileName: 'suggestion/skill.md',
     isCrossCutting: true,
   },
   'sourcecode-analyzer': {
-    templateFileName: 'sourcecode-analyzer-skill.md',
+    templateFileName: 'sourcecode-analyzer/skill.md',
     isCrossCutting: true,
-    viFileName: 'sourcecode-analyzer-skill.vi.md',
+    viFileName: 'sourcecode-analyzer/skill.vi.md',
   },
   'project-memory': {
-    templateFileName: 'project-memory-skill.md',
-    viFileName: 'project-memory-skill.vi.md',
+    templateFileName: 'project-memory/skill.md',
+    viFileName: 'project-memory/skill.vi.md',
     isCrossCutting: true,
   },
   'smart-explore': {
-    templateFileName: 'smart-explore-skill.md',
+    templateFileName: 'smart-explore/skill.md',
     isCrossCutting: true,
   },
   'deploy-documentation': {
-    templateFileName: 'deploy-documentation-skill.md',
+    templateFileName: 'deploy-documentation/skill.md',
     isCrossCutting: true,
-    resourceDirs: ['templates'],
+    resourceDirs: ['ui-ux/templates'],
+  },
+  'code-review': {
+    templateFileName: 'code-review/skill.md',
+    viFileName: 'code-review/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'debug': {
+    templateFileName: 'debug/skill.md',
+    viFileName: 'debug/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'system-design': {
+    templateFileName: 'system-design/skill.md',
+    viFileName: 'system-design/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'tech-debt': {
+    templateFileName: 'tech-debt/skill.md',
+    viFileName: 'tech-debt/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'spec-writer': {
+    templateFileName: 'spec-writer/skill.md',
+    viFileName: 'spec-writer/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'seo-audit': {
+    templateFileName: 'seo-audit/skill.md',
+    viFileName: 'seo-audit/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'campaign-plan': {
+    templateFileName: 'campaign-plan/skill.md',
+    viFileName: 'campaign-plan/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'content-creation': {
+    templateFileName: 'content-creation/skill.md',
+    viFileName: 'content-creation/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'email-sequence': {
+    templateFileName: 'email-sequence/skill.md',
+    viFileName: 'email-sequence/skill.vi.md',
+    isCrossCutting: true,
+  },
+  'sql-queries': {
+    templateFileName: 'sql-queries/skill.md',
+    viFileName: 'sql-queries/skill.vi.md',
+    isCrossCutting: true,
   },
   
   // Perfex module skills
   'perfex-module:module-codebase': {
-    templateFileName: 'module-codebase-skill.md',
+    templateFileName: 'perfex-module/module-codebase/skill.md',
     isCrossCutting: false,
     projectType: 'perfex-module',
   },
   'wordpress:ux-element': {
-    templateFileName: 'ux-element-skill.md',
+    templateFileName: 'wordpress/ux-element/skill.md',
     isCrossCutting: false,
     projectType: 'wordpress',
-    resourceDirs: ['ux-element/templates'],
+    resourceDirs: ['wordpress/ux-element/templates'],
   },
   'wordpress:plugin-standard': {
-    templateFileName: 'wordpress-plugin-standard-skill.md',
+    templateFileName: 'wordpress/plugin-standard/skill.md',
     isCrossCutting: false,
     projectType: 'wordpress',
-    resourceDirs: ['wordpress-plugin-standard/templates'],
+    resourceDirs: ['wordpress/plugin-standard/templates'],
   },
   'wordpress:plugin-check': {
-    templateFileName: 'wordpress-plugin-check-skill.md',
+    templateFileName: 'wordpress/plugin-check/skill.md',
     isCrossCutting: false,
     projectType: 'wordpress',
   },
   'wordpress:plugin-directory': {
-    templateFileName: 'plugin-directory-skill.md',
+    templateFileName: 'wordpress/plugin-directory/skill.md',
     isCrossCutting: false,
     projectType: 'wordpress',
   },
   // WordPress Plugin specific (matches PROJECT_TYPES)
   'wordpress-plugin:plugin-check': {
-    templateFileName: 'wordpress-plugin-check-skill.md',
+    templateFileName: 'wordpress/plugin-check/skill.md',
     isCrossCutting: false,
     projectType: 'wordpress-plugin',
   },
   'wordpress-plugin:plugin-directory': {
-    templateFileName: 'plugin-directory-skill.md',
+    templateFileName: 'wordpress/plugin-directory/skill.md',
     isCrossCutting: false,
     projectType: 'wordpress-plugin',
   },

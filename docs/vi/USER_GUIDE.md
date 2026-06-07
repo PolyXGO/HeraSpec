@@ -606,7 +606,7 @@ heraspec restore 2025-01-15-add-two-factor-auth --yes
 **Ví dụ:**
 ```bash
 # Xem danh sách archives
-ls heraspec/changes/archives/
+ls heraspec/archives/
 # → 2025-01-15-add-two-factor-auth
 # → 2025-01-20-add-search-feature
 
@@ -808,13 +808,9 @@ Tasks được nhóm theo project type và skill:
 
 1. **Copy từ HeraSpec core templates** (nếu đang phát triển HeraSpec):
    ```bash
-   # Copy skill template vào project
-   cp -r /path/to/HeraSpec/src/core/templates/skills/ui-ux-skill.md \
-         heraspec/skills/ui-ux/skill.md
-   
-   # Copy scripts và templates nếu có
-   cp -r /path/to/HeraSpec/src/core/templates/skills/scripts \
-         heraspec/skills/ui-ux/
+   # Copy skill template và tài nguyên vào project
+   cp -r /path/to/HeraSpec/src/core/templates/skills/ui-ux \
+         heraspec/skills/
    ```
 
 2. **Tạo skill mới** theo cấu trúc:

@@ -83,11 +83,6 @@ Here are some products built partially or entirely using the HeraSpec framework:
 </ul>
 
 <!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
-
-<!-- HeraSpec Section -->
-
 ## HeraSpec Development
 
 This project uses [HeraSpec](https://github.com/PolyXGO/HeraSpec) for spec-driven development. For more information, see the [HeraSpec documentation](./docs/en/USER_GUIDE.md).

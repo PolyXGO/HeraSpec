@@ -44,6 +44,7 @@ This document defines the workflow for AI agents working with HeraSpec.
 - **SKILL PREREQUISITE**: If a task maps to a skill (e.g., "Generate documentation"), you **MUST** verify the skill folder exists in \`heraspec/skills/\`. If missing:
   - **Preferred**: Proactively install it via \`heraspec skill add <name>\` (e.g., \`heraspec skill add documents\`) if you have terminal access.
   - **Fallback**: If you cannot install it, **STOP** and ask the user to add it. **DO NOT** attempt manual generation without the skill.
+- **IGNORE VIETNAMESE SKILL FILES**: When reading and executing skill workflows, you **MUST ONLY** look at the English version of the skill instructions (e.g., \`skill.md\`). You **MUST completely ignore** all Vietnamese versions (e.g., \`skill.vi.md\` or files ending with \`*.vi.md\`). These Vietnamese files are for reference/development purposes by the user only.
 - **USER CONFIRMATION**: For destructive actions or public releases, always request explicit User approval first.
 
 ### Restricted Commands (REQUIRE USER CONFIRMATION)
@@ -134,6 +135,7 @@ The following commands are classified by risk level. You **MUST NOT** execute th
    - Understand purpose, steps, inputs, outputs
    - Follow tone, rules, and limitations
    - Check available templates and scripts
+   - **Ignore Vietnamese Skill Files**: Only read the English \`skill.md\` instructions. Completely ignore any \`*.vi.md\` translation files.
 
 4. **Use skill resources**:
    - Run scripts from \`scripts/\` folder if needed
@@ -341,6 +343,7 @@ If \\\`heraspec/skills/smart-explore/\\\` exists, prefer token-efficient explora
      > heraspec skill add documents"
    - **DO NOT** create a task plan or attempt manual generation without the skill language.
 3. **Execute After Install**: Only after the skill folder is created (or installed), read the \`skill.md\` and proceed with the task.
+4. **Ignore Vietnamese Skill Files**: You MUST only read the English \`skill.md\` file inside the skill folder. Completely ignore all \`*.vi.md\` files (e.g., \`skill.vi.md\`), as they are strictly for reference purposes by human developers.
 
 **Example prompt for Documents skill:**
 If you need to generate multi-format documentation, use this prompt:

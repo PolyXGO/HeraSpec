@@ -68,7 +68,6 @@ export class ArchiveCommand {
       const archiveDir = path.join(
         '.',
         HERASPEC_DIR_NAME,
-        CHANGES_DIR_NAME,
         ARCHIVES_DIR_NAME
       );
       await FileSystemUtils.createDirectory(archiveDir);

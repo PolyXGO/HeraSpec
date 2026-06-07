@@ -49,30 +49,9 @@ This command will:
 
 If you prefer manual setup:
 
-1. **Create skill folder structure:**
+1. **Copy UI/UX skill folder:**
    ```bash
-   mkdir -p heraspec/skills/ui-ux/{scripts,data,templates,examples}
-   ```
-
-2. **Copy skill.md:**
-   ```bash
-   cp HeraSpec/src/core/templates/skills/ui-ux-skill.md heraspec/skills/ui-ux/skill.md
-   ```
-
-3. **Copy scripts:**
-   ```bash
-   cp HeraSpec/src/core/templates/skills/scripts/*.py heraspec/skills/ui-ux/scripts/
-   chmod +x heraspec/skills/ui-ux/scripts/search.py
-   ```
-
-4. **Copy data:**
-   ```bash
-   cp -r HeraSpec/src/core/templates/skills/data/* heraspec/skills/ui-ux/data/
-   ```
-
-5. **Copy templates:**
-   ```bash
-   cp -r HeraSpec/src/core/templates/skills/templates/*.md heraspec/skills/ui-ux/templates/
+   cp -r HeraSpec/src/core/templates/skills/ui-ux heraspec/skills/
    ```
 
 ## Usage

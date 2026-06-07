@@ -17,7 +17,6 @@ export class RestoreCommand {
     const archivesDir = path.join(
       '.',
       HERASPEC_DIR_NAME,
-      CHANGES_DIR_NAME,
       ARCHIVES_DIR_NAME
     );
 

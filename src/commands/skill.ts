@@ -416,7 +416,7 @@ export class SkillCommand {
       if (templateInfo.resourceDirs) {
         for (const resourceDir of templateInfo.resourceDirs) {
           const srcResourceDir = path.join(coreTemplatesDir, resourceDir);
-          const destResourceDir = path.join(destPath, resourceDir);
+          const destResourceDir = path.join(destPath, path.basename(resourceDir));
           
           if (await FileSystemUtils.fileExists(srcResourceDir)) {
             await FileSystemUtils.copyDirectory(srcResourceDir, destResourceDir);

@@ -440,15 +440,100 @@ export class InitCommand {
   }
 
   /**
-   * Generic section replacer: replace content from marker to next ## header
+   * Find the index of the next top-level H2 section in the markdown content.
+   * Tracks fenced code blocks to ignore H2 headers inside code blocks.
    */
-  private replaceSection(content: string, sectionMarker: string, newSection: string): string {
+  private findSectionEndIndex(content: string, startIndex: number): number {
+    const lines = content.substring(startIndex).split(/\r?\n/);
+    let offset = startIndex;
+    let inCodeBlock = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const lineLengthWithNewline = line.length + (content.charAt(offset + line.length) === '\r' ? 2 : 1);
+
+      if (i === 0) {
+        offset += lineLengthWithNewline;
+        continue;
+      }
+
+      if (line.trim().startsWith('```')) {
+        inCodeBlock = !inCodeBlock;
+      }
+
+      if (!inCodeBlock && line.startsWith('## ')) {
+        return offset;
+      }
+
+      offset += lineLengthWithNewline;
+    }
+
+    return content.length;
+  }
+
+  /**
+   * Finds the start index of the next standard section in the sequence.
+   * This is used to replace the entire section cleanly, even if there are internal H2s or duplicates.
+   */
+  private findNextSectionIndex(content: string, startIndex: number, currentHeader: string): number {
+    const sectionsOrder = [
+      ['## Universal Safety Rules'],
+      ['## Core Workflow'],
+      ['## Skills System', '## Skills system', '### Skills System', '### skills system'],
+      ['## Proactive Memory-Aware Development', '## Memory-Aware Development']
+    ];
+
+    // Find the group index of the current header
+    let currentGroupIndex = -1;
+    for (let i = 0; i < sectionsOrder.length; i++) {
+      if (sectionsOrder[i].some(h => currentHeader.toLowerCase().trim() === h.toLowerCase().trim())) {
+        currentGroupIndex = i;
+        break;
+      }
+    }
+
+    if (currentGroupIndex === -1) {
+      // Fallback to finding the next generic H2 header
+      return this.findSectionEndIndex(content, startIndex);
+    }
+
+    // Look for any variation of subsequent section headers in the content after startIndex
+    let nextSectionIndex = -1;
+
+    for (let i = currentGroupIndex + 1; i < sectionsOrder.length; i++) {
+      const variations = sectionsOrder[i];
+      for (const variation of variations) {
+        const idx = content.indexOf(variation, startIndex + currentHeader.length);
+        if (idx !== -1) {
+          if (nextSectionIndex === -1 || idx < nextSectionIndex) {
+            nextSectionIndex = idx;
+          }
+        }
+      }
+    }
+
+    if (nextSectionIndex !== -1) {
+      return nextSectionIndex;
+    }
+
+    // If no subsequent standard sections are found, fall back to next generic H2 or end of file
+    return this.findSectionEndIndex(content, startIndex);
+  }
+
+  /**
+   * Generic section replacer: replace content from marker to next H2 header or endMarker
+   */
+  private replaceSection(content: string, sectionMarker: string, newSection: string, endMarker?: string): string {
     const startIndex = content.indexOf(sectionMarker);
     if (startIndex === -1) return content;
 
-    let endIndex = content.indexOf('\n## ', startIndex + sectionMarker.length);
+    let endIndex = -1;
+    if (endMarker) {
+      endIndex = content.indexOf(endMarker, startIndex + sectionMarker.length);
+    }
+
     if (endIndex === -1) {
-      endIndex = content.length;
+      endIndex = this.findNextSectionIndex(content, startIndex, sectionMarker);
     }
 
     const before = content.substring(0, startIndex).trimEnd();
@@ -456,7 +541,7 @@ export class InitCommand {
     return before + '\n\n' + newSection + (after.trimStart().startsWith('\n') ? '' : '\n\n') + after;
   }
 
-  private replaceSkillsSection(existingContent: string, newSkillsSection: string): string {
+  private replaceSkillsSection(existingContent: string, newSkillsSection: string, endMarker?: string): string {
     const startMarkers = ['## Skills System', '## Skills system', '### Skills System', '### Skills system'];
     
     let startIndex = -1;
@@ -474,38 +559,22 @@ export class InitCommand {
       return this.appendSkillsSection(existingContent, newSkillsSection);
     }
 
-    // Find the end of Skills section (before next ## section or end of file)
-    let endIndex = existingContent.indexOf('\n## ', startIndex + foundMarker.length);
-    if (endIndex === -1) {
-      endIndex = existingContent.indexOf('\n### ', startIndex + foundMarker.length);
-    }
-    
-    if (endIndex === -1) {
-      endIndex = existingContent.length;
+    let endIndex = -1;
+    if (endMarker) {
+      endIndex = existingContent.indexOf(endMarker, startIndex + foundMarker.length);
     }
 
-    // Replace the section
+    if (endIndex === -1) {
+      endIndex = this.findNextSectionIndex(existingContent, startIndex, foundMarker);
+    }
+
     const before = existingContent.substring(0, startIndex).trimEnd();
     const after = existingContent.substring(endIndex);
     return before + '\n\n' + newSkillsSection + (after.trimStart().startsWith('\n') ? '' : '\n\n') + after;
   }
 
   private replaceSafetyRules(existingContent: string, newSafetySection: string): string {
-    const marker = '## Universal Safety Rules';
-    const startIndex = existingContent.indexOf(marker);
-    
-    if (startIndex === -1) return existingContent;
-
-    // Find end of section (next ## header)
-    let endIndex = existingContent.indexOf('\n## ', startIndex + marker.length);
-    if (endIndex === -1) {
-        endIndex = existingContent.length;
-    }
-
-    const before = existingContent.substring(0, startIndex).trimEnd();
-    const after = existingContent.substring(endIndex);
-    
-    return before + '\n\n' + newSafetySection + (after.trimStart().startsWith('\n') ? '' : '\n\n') + after;
+    return this.replaceSection(existingContent, '## Universal Safety Rules', newSafetySection, '## Core Workflow');
   }
 
   private appendSkillsSection(existingContent: string, skillsSection: string): string {
@@ -629,7 +698,7 @@ export class InitCommand {
       if (templateInfo.resourceDirs) {
         for (const resourceDir of templateInfo.resourceDirs) {
           const srcResourceDir = path.join(coreTemplatesDir, resourceDir);
-          const destResourceDir = path.join(skillPath, resourceDir);
+          const destResourceDir = path.join(skillPath, path.basename(resourceDir));
 
           if (await FileSystemUtils.fileExists(srcResourceDir)) {
             // Remove old and replace — these are template-owned directories
@@ -982,15 +1051,12 @@ python3 heraspec/skills/ui-ux/scripts/search.py "pricing plans" --domain pages
 1. Copy skill from HeraSpec core:
    \`\`\`bash
    # Copy UI/UX skill
-   cp -r /path/to/HeraSpec/src/core/templates/skills/ui-ux-skill.md heraspec/skills/ui-ux/
-   cp -r /path/to/HeraSpec/src/core/templates/skills/scripts heraspec/skills/ui-ux/
-   cp -r /path/to/HeraSpec/src/core/templates/skills/data heraspec/skills/ui-ux/
-   cp -r /path/to/HeraSpec/src/core/templates/skills/templates heraspec/skills/ui-ux/
+   cp -r /path/to/HeraSpec/src/core/templates/skills/ui-ux heraspec/skills/
    \`\`\`
 
 2. Or use \`heraspec skill add ui-ux\` (if available)
 
-3. Read \`heraspec/skills/ui-ux/ui-ux-skill.md\` for complete documentation
+3. Read \`heraspec/skills/ui-ux/skill.md\` for complete documentation
 
 ### Flatsome UX Element Skill
 
@@ -1141,7 +1207,7 @@ python3 heraspec/skills/ui-ux/scripts/search.py "product-detail single-product" 
 ## 📚 Detailed Documentation
 
 After copying UI/UX skill to your project, see:
-- \`heraspec/skills/ui-ux/ui-ux-skill.md\` - Complete skill documentation
+- \`heraspec/skills/ui-ux/skill.md\` - Complete skill documentation
 - \`heraspec/skills/ui-ux/templates/example-prompt-full-theme.md\` - Detailed prompt examples
 - \`heraspec/skills/ui-ux/templates/prompt-template-full-theme.md\` - Copy-paste templates
 
@@ -1157,10 +1223,7 @@ After copying UI/UX skill to your project, see:
 
 1. Copy UI/UX skill to project:
    \`\`\`bash
-   cp -r /path/to/HeraSpec/src/core/templates/skills/ui-ux-skill.md heraspec/skills/ui-ux/
-   cp -r /path/to/HeraSpec/src/core/templates/skills/scripts heraspec/skills/ui-ux/
-   cp -r /path/to/HeraSpec/src/core/templates/skills/data heraspec/skills/ui-ux/
-   cp -r /path/to/HeraSpec/src/core/templates/skills/templates heraspec/skills/ui-ux/
+   cp -r /path/to/HeraSpec/src/core/templates/skills/ui-ux heraspec/skills/
    \`\`\`
 
 2. Use prompt template from above
@@ -1191,37 +1254,49 @@ After copying UI/UX skill to your project, see:
     const existingContent = await FileSystemUtils.readFile(readmePath);
     const heraspecSection = this.getHeraSpecReadmeSection();
 
-    // Check if HeraSpec section already exists
-    const sectionMarkers = [
-      '## HeraSpec',
-      '## HeraSpec Development',
-      '### HeraSpec',
-      '### HeraSpec Development',
-      '<!-- HeraSpec Section -->',
-    ];
-
-    let hasHeraSpecSection = false;
     let sectionStartIndex = -1;
     let sectionEndIndex = -1;
 
-    for (const marker of sectionMarkers) {
-      const index = existingContent.indexOf(marker);
-      if (index !== -1) {
-        hasHeraSpecSection = true;
-        sectionStartIndex = index;
-        // Find the end of the section (next ## or end of file)
-        sectionEndIndex = existingContent.indexOf('\n## ', index + marker.length);
-        if (sectionEndIndex === -1) {
-          sectionEndIndex = existingContent.indexOf('\n### ', index + marker.length);
+    const commentMarker = '<!-- HeraSpec Section -->';
+    const commentIndex = existingContent.indexOf(commentMarker);
+    if (commentIndex !== -1) {
+      sectionStartIndex = commentIndex;
+      // Find the first header after the comment marker to identify the current section's header
+      const firstHeaderIndex = existingContent.indexOf('## ', commentIndex + commentMarker.length);
+      if (firstHeaderIndex !== -1) {
+        // The end of the section is the next top-level header after this one
+        let nextHeaderIndex = existingContent.indexOf('\n## ', firstHeaderIndex + 3);
+        if (nextHeaderIndex === -1) {
+          nextHeaderIndex = existingContent.indexOf('\n### ', firstHeaderIndex + 3);
         }
-        if (sectionEndIndex === -1) {
-          sectionEndIndex = existingContent.length;
+        sectionEndIndex = nextHeaderIndex !== -1 ? nextHeaderIndex : existingContent.length;
+      } else {
+        sectionEndIndex = existingContent.length;
+      }
+    } else {
+      const sectionMarkers = [
+        '## HeraSpec Development',
+        '## HeraSpec',
+        '### HeraSpec Development',
+        '### HeraSpec',
+      ];
+      for (const marker of sectionMarkers) {
+        const index = existingContent.indexOf(marker);
+        if (index !== -1) {
+          sectionStartIndex = index;
+          sectionEndIndex = existingContent.indexOf('\n## ', index + marker.length);
+          if (sectionEndIndex === -1) {
+            sectionEndIndex = existingContent.indexOf('\n### ', index + marker.length);
+          }
+          if (sectionEndIndex === -1) {
+            sectionEndIndex = existingContent.length;
+          }
+          break;
         }
-        break;
       }
     }
 
-    if (hasHeraSpecSection && sectionStartIndex !== -1) {
+    if (sectionStartIndex !== -1) {
       // Update existing section
       const before = existingContent.substring(0, sectionStartIndex).trimEnd();
       const after = existingContent.substring(sectionEndIndex);
